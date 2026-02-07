@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yapay Zeka Tarihçesi — İnteraktif Keşif</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&family=Forum&family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&family=Forum&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:17px}
+body{
+  font-family:'Outfit',system-ui,-apple-system,sans-serif;
+  background:#FAFAFA;color:#1F2937;
+  min-height:100vh;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:#D8C7BD;color:#22495A}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f5f5f5}
+::-webkit-scrollbar-thumb{background:#D8C7BD;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#22495A}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+
+:root{
+  --teal:#22495A;--dark-teal:#1A3642;--beige:#D8C7BD;
+  --light-beige:#F2EBE7;--cream:#FAFAFA;--text:#1F2937;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+  --gray-600:#4b5563;--gray-800:#1f2937;
+  --red-500:#ef4444;--orange-500:#f97316;--yellow-500:#eab308;
+  --green-500:#22c55e;--blue-500:#3b82f6;--purple-500:#8b5cf6;
+  --font-serif:'Caudex',Georgia,serif;
+  --font-display:'Forum','Caudex',serif;
+  --shadow-card:0 4px 6px -1px rgba(0,0,0,.04),0 2px 4px -1px rgba(0,0,0,.02);
+  --shadow-lg:0 8px 25px rgba(0,0,0,.08);
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1);
+}
+
+/* BACKGROUNDS */
+.bg-decor1{position:fixed;top:-100px;right:-100px;width:500px;height:500px;background:rgba(216,199,189,.12);border-radius:50%;filter:blur(100px);z-index:-1;pointer-events:none}
+.bg-decor2{position:fixed;bottom:-100px;left:-100px;width:600px;height:600px;background:rgba(34,73,90,.06);border-radius:50%;filter:blur(120px);z-index:-1;pointer-events:none}
+.bg-decor3{position:fixed;top:50%;left:50%;width:400px;height:400px;background:rgba(139,92,246,.04);border-radius:50%;filter:blur(100px);z-index:-1;pointer-events:none;transform:translate(-50%,-50%)}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* CARD */
+.card{background:#fff;box-shadow:var(--shadow-card);border:1px solid rgba(229,231,235,.5);border-radius:1rem;padding:1.25rem;transition:transform .2s,box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-lg)}
+.card-bordered{border:1px solid rgba(229,231,235,.5)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-100);padding:.75rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.nav-logo{display:flex;align-items:center;gap:.5rem;cursor:pointer}
+.nav-icon{width:36px;height:36px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff}
+.nav-logo span{font-family:var(--font-display);font-size:1.2rem;color:var(--teal);font-weight:700;letter-spacing:.02em}
+.nav-links{display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center}
+.nav-links a{color:var(--gray-500);text-decoration:none;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;transition:color .2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--teal)}
+.nav-menu-btn{display:none;font-size:1.3rem;color:var(--teal);padding:.25rem}
+@media(max-width:900px){
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;padding:1rem 2rem;flex-direction:column;gap:.75rem;border-bottom:1px solid var(--gray-200);box-shadow:var(--shadow-lg)}
+  .nav-links.open{display:flex}
+  .nav-menu-btn{display:block}
+}
+
+/* HERO */
+.hero{text-align:center;padding:4rem 2rem 3rem;max-width:800px;margin:0 auto}
+.hero-badge{display:inline-block;padding:.3rem 1rem;border-radius:999px;background:var(--light-beige);color:var(--teal);font-size:.7rem;font-weight:700;letter-spacing:.05em;margin-bottom:1.5rem}
+.hero-icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:90px;height:90px;border-radius:50%;background:var(--light-beige);margin-bottom:1rem;box-shadow:0 8px 25px rgba(216,199,189,.25);animation:float 4s ease-in-out infinite}
+.hero-emoji{font-size:2.8rem}
+.hero h1{font-size:clamp(2.2rem,5vw,3.2rem);font-family:var(--font-display);font-weight:700;color:var(--teal);margin-bottom:.75rem;letter-spacing:-.01em}
+.hero h1 span{color:var(--gray-800)}
+.hero-sub{color:var(--gray-500);font-size:1.1rem;max-width:36rem;margin:0 auto 1.5rem}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;max-width:28rem;margin:0 auto 1.5rem}
+.stat-card{text-align:center;padding:.75rem}
+.stat-lbl{font-size:.6rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.1em;font-weight:700;display:block}
+.stat-val{font-size:1.3rem;font-family:var(--font-serif);font-weight:700;color:var(--teal)}
+.hero-scroll{display:inline-block;color:var(--teal);text-decoration:none;font-weight:600;font-size:.85rem;padding:.5rem 1.5rem;border:2px solid var(--teal);border-radius:999px;transition:all .2s}
+.hero-scroll:hover{background:var(--teal);color:#fff}
+
+/* SECTIONS */
+.content-section{padding:3.5rem 2rem}
+.alt-bg{background:var(--gray-50)}
+.section-wrap{max-width:1100px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:2.5rem}
+.section-header h2{font-size:clamp(1.6rem,3.5vw,2.3rem);font-family:var(--font-display);font-weight:700;color:var(--teal);margin-top:.5rem}
+.section-desc{color:var(--gray-500);font-size:.95rem;max-width:550px;margin:.25rem auto 0}
+
+/* CHIPS */
+.chip{display:inline-block;padding:.35rem .9rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;transition:all .2s}
+.chip:hover{background:var(--gray-50)}
+.chip.active,.chip-teal{background:var(--teal)!important;color:#fff!important;border-color:var(--teal)!important}
+.chip-beige{background:var(--light-beige)!important;color:var(--teal)!important;border-color:var(--beige)!important}
+.chip-orange{background:#fff7ed!important;color:var(--orange-500)!important;border-color:#fed7aa!important}
+.chip-red{background:#fef2f2!important;color:var(--red-500)!important;border-color:#fecaca!important}
+.chip-green{background:#f0fdf4!important;color:var(--green-500)!important;border-color:#bbf7d0!important}
+.chip-blue{background:#eff6ff!important;color:var(--blue-500)!important;border-color:#bfdbfe!important}
+.chip-purple{background:#faf5ff!important;color:var(--purple-500)!important;border-color:#ddd6fe!important}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem}
+.inner-grid{gap:1.5rem;align-items:start}
+
+/* TEXT COLORS */
+.text-teal{color:var(--teal)}.text-red{color:var(--red-500)}.text-orange{color:var(--orange-500)}.text-green{color:var(--green-500)}.text-blue{color:var(--blue-500)}.text-purple{color:var(--purple-500)}.text-yellow{color:var(--yellow-500)}.text-muted{color:var(--gray-400)}.text-secondary{color:var(--gray-500)}.small{font-size:.85rem}.center{text-align:center}
+
+/* AI DEF */
+.ai-def{font-size:1.05rem;font-weight:600;color:var(--teal);margin-bottom:.5rem}
+.callout{background:var(--gray-50);border-radius:.75rem;padding:1rem;margin-top:.75rem;border-left:3px solid var(--teal);font-size:.9rem}
+.callout-teal{border-left-color:var(--teal);background:#f0f9ff}
+.callout-orange{border-left-color:var(--orange-500);background:#fff7ed}
+.callout-red{border-left-color:var(--red-500);background:#fef2f2}
+
+/* FEATURES */
+.feature-stack{display:flex;flex-direction:column;gap:.75rem}
+.feature-card{display:flex;gap:1rem;align-items:flex-start;padding:1rem}
+.feature-card h4{font-size:.9rem;font-weight:700;color:var(--gray-800);margin-bottom:.2rem}
+.feature-card p{font-size:.8rem;color:var(--gray-500)}
+.feature-icon{width:42px;height:42px;min-width:42px;border-radius:.75rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.fi-teal{background:rgba(34,73,90,.1)}.fi-beige{background:var(--light-beige)}
+
+/* PIONEERS */
+.pioneer-card{padding:1.5rem;border-left:4px solid var(--teal)}
+.pioneer-card h3{color:var(--gray-800);font-size:1.15rem;margin-bottom:.15rem}
+.pioneer-role{color:var(--gray-400);font-size:.8rem;margin-bottom:.5rem;font-weight:600}
+.pioneer-card p:last-child{font-size:.9rem;color:var(--gray-600)}
+.pioneer-badge{display:inline-block;padding:.2rem .6rem;border-radius:.5rem;font-size:.65rem;font-weight:700;margin-bottom:.5rem}
+.badge-purple{background:#faf5ff;color:var(--purple-500)}.badge-teal{background:rgba(34,73,90,.08);color:var(--teal)}.badge-orange{background:#fff7ed;color:var(--orange-500)}.badge-green{background:#f0fdf4;color:var(--green-500)}
+
+/* TURING DEMO */
+.turing-demo{background:var(--gray-50);border-radius:1rem;padding:1.5rem;text-align:center}
+.turing-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;margin:1rem 0}
+.turing-box{background:#fff;border-radius:.75rem;padding:1rem;text-align:center;border:1px solid var(--gray-200)}
+.turing-emoji{font-size:2.5rem;margin-bottom:.25rem}
+.turing-vs{width:40px;height:40px;border-radius:50%;background:var(--red-500);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.8rem;margin:0 auto}
+
+/* ROOM STEPS */
+.room-steps{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;align-items:flex-start}
+.room-step{flex:1;min-width:180px;max-width:280px;text-align:center}
+.room-step h4{margin-bottom:.25rem;font-size:.9rem}
+.step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;margin:0 auto .5rem;color:#fff;font-size:.9rem}
+.sn-teal{background:var(--teal)}.sn-orange{background:var(--orange-500)}.sn-green{background:var(--green-500)}
+.step-arrow{color:var(--gray-300);font-size:1.5rem;display:flex;align-items:center;padding-top:1rem}
+@media(max-width:600px){.step-arrow{display:none}}
+
+/* FOUNDERS */
+.founder-card{text-align:center;padding:1.5rem}
+.founder-card h3{color:var(--gray-800);font-size:1.05rem;margin-bottom:.15rem}
+.founder-years{color:var(--teal);font-size:.75rem;font-weight:700;margin-bottom:.5rem}
+.founder-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto .75rem}
+.fa-teal{background:rgba(34,73,90,.1)}.fa-beige{background:var(--light-beige)}
+
+/* TABS */
+.tab-nav{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .4s ease}
+
+/* CHAT */
+.chat-sim{overflow:hidden;border:1px solid var(--gray-200)}
+.chat-header{background:linear-gradient(135deg,var(--teal),var(--dark-teal));padding:.75rem;text-align:center;font-weight:700;color:#fff;font-size:.85rem}
+.chat-messages{height:250px;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem;background:var(--gray-50)}
+.chat-msg{max-width:80%;padding:.6rem .9rem;border-radius:1rem;font-size:.85rem;animation:slideUp .3s ease}
+.chat-msg.bot{background:#fff;align-self:flex-start;border:1px solid var(--gray-200);border-bottom-left-radius:.25rem}
+.chat-msg.user{background:var(--teal);color:#fff;align-self:flex-end;border-bottom-right-radius:.25rem}
+.chat-input-area{display:flex;gap:.4rem;padding:.6rem;background:#fff;border-top:1px solid var(--gray-200)}
+.chat-input-area input{flex:1;padding:.5rem .75rem;border:1px solid var(--gray-200);border-radius:999px;font-size:.85rem;outline:none;font-family:inherit}
+.chat-input-area input:focus{border-color:var(--teal)}
+.chat-input-area button{padding:.5rem 1rem;border-radius:999px;background:var(--teal);color:#fff;font-weight:700;font-size:.8rem;transition:background .2s}
+.chat-input-area button:hover{background:var(--dark-teal)}
+
+/* MINI STATS */
+.mini-stats{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+.mini-stat{text-align:center;flex:1;min-width:80px}
+.ms-num{font-size:1.5rem;font-family:var(--font-serif);font-weight:700;display:block;line-height:1.2}
+.ms-lbl{font-size:.65rem;color:var(--gray-400);text-transform:uppercase;font-weight:700;letter-spacing:.05em}
+
+/* NEURAL NETWORK */
+.nn-canvas-wrap{padding:.5rem;overflow:hidden}
+.nn-canvas-wrap canvas{width:100%;border-radius:.5rem;cursor:pointer;display:block}
+.nn-controls{display:flex;gap:.5rem;justify-content:center;margin-top:.75rem;flex-wrap:wrap}
+
+/* BAR CHART */
+.bar-chart{margin-top:1rem}.bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.bar-fill{height:14px;border-radius:999px}.bar-red{background:var(--red-500)}.bar-green{background:var(--green-500)}
+.bar-label{font-size:.75rem;color:var(--gray-500);white-space:nowrap}
+
+/* MATCH SCORE */
+.match-score{display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap}
+.score-side{text-align:center;flex:1;min-width:180px}
+.score-emoji{font-size:3rem;margin-bottom:.25rem}
+.score-name{font-size:1.15rem;font-weight:800}
+.score-num{font-size:2.5rem;font-family:var(--font-serif);font-weight:700;margin-top:.25rem}
+.score-vs{font-size:1.5rem;font-weight:900;color:var(--red-500)}
+
+/* GPT LETTERS */
+.gpt-letters{display:flex;justify-content:center;gap:2.5rem;margin:1.5rem 0;flex-wrap:wrap}
+.gpt-letter{text-align:center}.gpt-big{font-size:3.5rem;font-weight:900;font-family:var(--font-serif);line-height:1}
+.gpt-word{font-size:.85rem;font-weight:700;color:var(--gray-800);margin-top:.15rem}
+.gpt-tr{font-size:.75rem;color:var(--gray-400);font-style:italic}
+
+/* GENAI FLOW */
+.genai-flow{display:flex;gap:.75rem;overflow-x:auto;padding:.5rem 0;-webkit-overflow-scrolling:touch}
+.genai-card{min-width:185px;flex-shrink:0;padding:1.25rem}
+.genai-card:hover{transform:translateY(-3px)}
+.genai-year{font-weight:800;font-size:1.05rem;margin-bottom:.15rem}
+.genai-card h4{color:var(--gray-800);margin-bottom:.15rem}
+
+/* APP CARDS */
+.app-card{text-align:center;padding:1.25rem;cursor:default}
+.app-card:hover{transform:translateY(-3px)}
+.app-icon{font-size:2rem;margin-bottom:.5rem}
+.app-card h4{color:var(--gray-800);margin-bottom:.2rem}
+
+/* TIMELINE */
+.timeline{position:relative;padding:1.5rem 0}
+.timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--teal),var(--beige),var(--green-500),var(--orange-500));transform:translateX(-50%);border-radius:2px}
+.tl-item{display:flex;justify-content:flex-end;padding-right:calc(50% + 24px);margin-bottom:1.5rem;position:relative}
+.tl-item:nth-child(even){justify-content:flex-start;padding-right:0;padding-left:calc(50% + 24px)}
+.tl-dot{position:absolute;left:50%;top:.75rem;width:14px;height:14px;border-radius:50%;border:3px solid;background:#fff;transform:translateX(-50%);z-index:2;transition:transform .3s}
+.tl-dot:hover{transform:translateX(-50%) scale(1.3)}
+.tl-content{background:#fff;border-radius:.75rem;padding:1rem 1.25rem;max-width:380px;border:1px solid var(--gray-200);box-shadow:var(--shadow-card);transition:transform .2s}
+.tl-content:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.tl-year{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
+.tl-content h4{color:var(--gray-800);font-size:.9rem;margin-bottom:.15rem}
+.tl-content p{font-size:.8rem;color:var(--gray-500)}
+@media(max-width:768px){
+  .timeline::before{left:16px}
+  .tl-item,.tl-item:nth-child(even){padding-left:44px;padding-right:0;justify-content:flex-start}
+  .tl-dot{left:16px}
+  .tl-content{max-width:100%}
+}
+
+/* TURING SIMULATOR */
+.turing-sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.turing-sim-grid{grid-template-columns:1fr}}
+.turing-sim-box{min-height:200px}
+.turing-sim-box h4{margin-bottom:.5rem;font-size:.9rem}
+.turing-sim-msgs{display:flex;flex-direction:column;gap:.4rem;font-size:.8rem}
+.turing-sim-msgs .sim-q{color:var(--gray-500);font-style:italic}
+.turing-sim-msgs .sim-a{color:var(--gray-800);font-weight:500;padding:.4rem .6rem;background:var(--gray-50);border-radius:.5rem}
+.turing-btns{display:flex;gap:.5rem;justify-content:center;margin-top:.5rem}
+.turing-result{margin-top:.75rem;font-weight:700;font-size:.95rem}
+.btn-outline{padding:.5rem 1.2rem;background:#fff;border:1px solid var(--gray-200);color:var(--gray-600);font-weight:600;border-radius:.75rem;font-size:.85rem;transition:all .2s}
+.btn-outline:hover{background:var(--gray-50);border-color:var(--teal);color:var(--teal)}
+.btn-primary{padding:.6rem 1.5rem;background:var(--teal);color:#fff;font-weight:600;border-radius:.75rem;font-size:.85rem;transition:background .2s;border:none;box-shadow:0 4px 12px rgba(34,73,90,.2)}
+.btn-primary:hover{background:var(--dark-teal)}
+
+/* FLASHCARDS */
+.flashcard-container{perspective:1000px;max-width:450px;margin:0 auto}
+.flashcard{width:100%;min-height:220px;position:relative;cursor:pointer;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped{transform:rotateY(180deg)}
+.flashcard-front,.flashcard-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;padding:2rem;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.05rem;border:1px solid var(--gray-200)}
+.flashcard-front{background:#fff;color:var(--teal);font-weight:600;box-shadow:var(--shadow-card)}
+.flashcard-back{background:var(--teal);color:#fff;transform:rotateY(180deg);font-weight:500}
+
+/* SORT GAME */
+.sort-items{display:flex;flex-direction:column;gap:.5rem;max-width:500px;margin:0 auto}
+.sort-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:#fff;border:1px solid var(--gray-200);border-radius:.75rem;cursor:grab;transition:all .2s;user-select:none}
+.sort-item:active{cursor:grabbing;box-shadow:var(--shadow-lg)}
+.sort-item.correct{border-color:var(--green-500);background:#f0fdf4}
+.sort-item.wrong{border-color:var(--red-500);background:#fef2f2}
+.sort-handle{color:var(--gray-300);font-size:1.1rem}
+.sort-text{font-size:.85rem;font-weight:600;color:var(--gray-800)}
+.sort-result{margin-top:1rem;text-align:center;font-weight:700;font-size:.95rem}
+
+/* WORD CLOUD */
+.word-input-area{display:flex;gap:.4rem;margin-bottom:1rem;max-width:350px;margin-left:auto;margin-right:auto}
+.word-input-area input{flex:1;padding:.5rem .75rem;border:1px solid var(--gray-200);border-radius:999px;font-size:.85rem;outline:none;font-family:inherit}
+.word-input-area input:focus{border-color:var(--teal)}
+.word-input-area button{padding:.5rem 1rem;border-radius:999px;background:var(--teal);color:#fff;font-weight:700;font-size:.8rem;border:none}
+.word-cloud{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;min-height:80px;padding:1rem}
+.word-tag{padding:.3rem .8rem;border-radius:999px;font-size:.8rem;font-weight:600;animation:slideUp .3s ease}
+
+/* QUIZ */
+.quiz-container{max-width:650px;margin:0 auto;padding:1.5rem}
+.quiz-progress{display:flex;gap:.2rem;margin-bottom:1.5rem}
+.quiz-progress .dot{flex:1;height:4px;border-radius:2px;background:var(--gray-200);transition:background .3s}
+.quiz-progress .dot.done{background:var(--green-500)}
+.quiz-progress .dot.current{background:var(--teal)}
+.quiz-q{font-size:1.15rem;color:var(--gray-800);font-weight:700;margin-bottom:1.25rem}
+.quiz-opts{display:flex;flex-direction:column;gap:.6rem}
+.quiz-opt{padding:.85rem 1.2rem;background:var(--gray-50);border-radius:.75rem;border:2px solid transparent;cursor:pointer;transition:all .2s;font-size:.9rem;color:var(--gray-600);text-align:left;font-family:inherit;width:100%}
+.quiz-opt:hover{border-color:var(--teal);background:#fff}
+.quiz-opt.correct{border-color:var(--green-500);background:#f0fdf4;color:var(--green-500)}
+.quiz-opt.wrong{border-color:var(--red-500);background:#fef2f2;color:var(--red-500)}
+.quiz-opt.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:.75rem;padding:.75rem 1rem;border-radius:.75rem;font-weight:600;font-size:.85rem;display:none}
+.quiz-feedback.show{display:block}
+.quiz-next{margin-top:1rem;display:none}
+.quiz-result{text-align:center;padding:2rem;display:none}
+.quiz-big-score{font-size:3rem;font-family:var(--font-serif);font-weight:900;margin-bottom:.5rem}
+.quiz-score-text{font-size:1.1rem;color:var(--gray-800)}
+
+/* THOUGHT CARDS */
+.thought-card{text-align:center;padding:1.25rem;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.thought-card:hover,.thought-card.selected{border-color:var(--beige);transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.thought-card h4{margin-top:.25rem;margin-bottom:.25rem}
+
+/* FOOTER */
+footer{text-align:center;padding:2rem;border-top:1px solid var(--gray-200);background:#fff}
+footer p{color:var(--gray-500);font-size:.85rem}
+footer strong{color:var(--teal)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:.6rem 1rem}
+  .content-section{padding:2.5rem 1rem}
+  .hero{padding:3rem 1rem 2rem}
+  .turing-grid{grid-template-columns:1fr}
+  .match-score{flex-direction:column;gap:1rem}
+  .gpt-letters{gap:1.5rem}
+}
+
+/* FUN FACTS */
+.funfact{display:flex;gap:1rem;align-items:flex-start;padding:1.25rem;border-left:3px solid var(--orange-500);background:#fff7ed;margin-top:1rem;margin-bottom:1rem}
+.funfact-icon{font-size:1.5rem;flex-shrink:0;margin-top:.1rem}
+.funfact strong{color:var(--orange-500);font-size:.85rem;display:block;margin-bottom:.2rem}
+
+/* NAV XP */
+.nav-xp{display:flex;flex-direction:column;align-items:center;padding:0 .75rem}
+.nav-xp-label{font-size:.55rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.nav-xp-val{color:var(--teal);font-weight:700;font-family:var(--font-serif);font-size:1.1rem;line-height:1}
+@media(max-width:900px){.nav-xp{display:none}}
+
+/* DAILY AI GRID */
+.daily-ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;max-width:650px;margin:0 auto}
+.daily-ai-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--gray-50);border:2px solid var(--gray-200);border-radius:.75rem;cursor:pointer;transition:all .2s;user-select:none}
+.daily-ai-item:hover{background:#fff}
+.daily-ai-item.selected{border-color:var(--teal);background:rgba(34,73,90,.05)}
+.daily-ai-item.correct{border-color:var(--green-500);background:#f0fdf4}
+.daily-ai-item.wrong{border-color:var(--red-500);background:#fef2f2}
+.daily-ai-item .dai-icon{font-size:1.3rem}
+.daily-ai-item .dai-text{font-size:.85rem;font-weight:600;color:var(--gray-800)}
+
+/* AI HUMAN GAME */
+.ai-human-text{font-size:1rem;line-height:1.7;color:var(--gray-700)}
+
+/* ETHICS */
+.ethics-options{display:flex;flex-direction:column;gap:.5rem}
+.ethics-opt{padding:.85rem 1.2rem;background:var(--gray-50);border:2px solid var(--gray-200);border-radius:.75rem;cursor:pointer;transition:all .2s;font-size:.9rem;color:var(--gray-700);text-align:left;font-family:inherit;width:100%}
+.ethics-opt:hover{border-color:var(--teal);background:#fff}
+.ethics-opt.chosen{border-color:var(--teal);background:rgba(34,73,90,.05);font-weight:600}
+
+/* XP TOAST */
+.xp-toast{position:fixed;bottom:2rem;right:2rem;background:var(--teal);color:#fff;padding:.6rem 1.2rem;border-radius:.75rem;font-weight:700;font-size:.85rem;z-index:200;animation:slideUp .3s ease,fadeOut .5s ease 1.5s forwards;box-shadow:var(--shadow-lg)}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-10px)}}
+
+/* PERCEPTRON PLAYGROUND */
+.perceptron-canvas-wrap{padding:.5rem;overflow:hidden}
+.perceptron-canvas-wrap canvas{width:100%;border-radius:.5rem;cursor:crosshair;display:block;background:#fff}
+
+/* ATTENTION VISUALIZATION */
+.attention-viz{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;padding:1.5rem;background:var(--gray-50);border-radius:.75rem;min-height:80px}
+.attention-word{padding:.5rem 1rem;border-radius:.75rem;background:#fff;border:2px solid var(--gray-200);cursor:pointer;transition:all .2s;font-weight:600;font-size:.9rem;user-select:none}
+.attention-word:hover{border-color:var(--orange-500);background:#fff7ed;transform:scale(1.05)}
+.attention-word.active{border-color:var(--orange-500);background:var(--orange-500);color:#fff}
+.attention-connection{font-size:.75rem;color:var(--gray-400);font-style:italic;padding:.25rem .5rem}
+
+/* ML SCENARIO GAME */
+.ml-options{display:flex;flex-direction:column;gap:.5rem}
+.ml-option{padding:.85rem 1.2rem;background:var(--gray-50);border:2px solid var(--gray-200);border-radius:.75rem;cursor:pointer;transition:all .2s;font-size:.9rem;color:var(--gray-700);text-align:left;font-family:inherit;width:100%}
+.ml-option:hover{border-color:var(--teal);background:#fff}
+.ml-option.selected{border-color:var(--teal);background:rgba(34,73,90,.05);font-weight:600}
+.ml-option.correct{border-color:var(--green-500);background:#f0fdf4;color:var(--green-500)}
+.ml-option.wrong{border-color:var(--red-500);background:#fef2f2;color:var(--red-500)}
+
+</style>
+</head>
+<body>
+<div class="bg-decor1"></div>
+<div class="bg-decor2"></div>
+<div class="bg-decor3"></div>
+
+<nav id="mainNav">
+  <div class="nav-logo">
+    <div class="nav-icon">🧠</div>
+    <span>YZ Tarihçesi</span>
+  </div>
+  <div class="nav-xp">
+    <span class="nav-xp-label">Keşif XP</span>
+    <span class="nav-xp-val" id="navXP">0</span>
+  </div>
+  <div class="nav-links">
+    <a href="#whatisai">YZ Nedir?</a>
+    <a href="#philosophy">Temeller</a>
+    <a href="#turing">Turing</a>
+    <a href="#dartmouth">Dartmouth</a>
+    <a href="#programs">İlk Programlar</a>
+    <a href="#winter">YZ Kışı</a>
+    <a href="#perceptron">Perceptron</a>
+    <a href="#backprop">Sinir Ağları</a>
+    <a href="#deepblue">Deep Blue</a>
+    <a href="#deeplearning">Derin Öğrenme</a>
+    <a href="#transformer">Transformer</a>
+    <a href="#mltypes">ML Türleri</a>
+    <a href="#genai">Üretken YZ</a>
+    <a href="#timeline">Zaman Çizelgesi</a>
+    <a href="#interactive">Araçlar</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+  <button class="nav-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-badge">🏛️ Habitat &bull; 📡 Vodafone Vakfı &bull; ⭐ Yapay Zeka Yıldızları</div>
+  <div class="hero-icon-wrap"><span class="hero-emoji">🧠</span></div>
+  <h1>Yapay Zeka <span>Tarihçesi</span></h1>
+  <p class="hero-sub">Düşünceden Dijital Zekaya: Antik Çağdan Günümüze Yapay Zekanın Evrimi</p>
+  <div class="hero-stats">
+    <div class="card stat-card"><span class="stat-lbl">Konu</span><span class="stat-val">25+</span></div>
+    <div class="card stat-card"><span class="stat-lbl">İnteraktif Araç</span><span class="stat-val">12</span></div>
+    <div class="card stat-card"><span class="stat-lbl">Quiz Sorusu</span><span class="stat-val">10</span></div>
+  </div>
+  <a href="#whatisai" class="hero-scroll">↓ Keşfetmeye Başla</a>
+</section>
+
+<!-- YAPAY ZEKA NEDİR -->
+<section id="whatisai" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">TEMEL KAVRAM</div>
+      <h2>Yapay Zeka Nedir?</h2>
+      <p class="section-desc">Bilgisayarları akıllı hale getirme bilimi</p>
+    </div>
+    <div class="grid-2">
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+        <p class="ai-def">Yapay Zeka (YZ), bilgisayarların insanlar gibi düşünmesini, öğrenmesini ve problem çözmesini sağlayan bir bilim dalıdır.</p>
+        <p class="text-secondary">İnsan zekasının doğal süreçlerini — algılama, öğrenme, akıl yürütme, problem çözme ve dil anlama gibi yetenekleri — bilgisayar programlarıyla taklit etmeye çalışır.</p>
+        <div class="callout callout-teal">
+          <strong>💡 Şöyle düşünün:</strong><br>
+          Bir bilgisayara binlerce kedi fotoğrafı gösterdiğinizde, YZ sayesinde o bilgisayar yeni bir kedi fotoğrafı gördüğünde "Bu bir kedi!" diyebilir. Bir oyunda zekice hamleler yapabilir, hatta sizinle sohbet edebilir!
+        </div>
+      </div>
+      <div class="feature-stack">
+        <div class="card feature-card reveal"><div class="feature-icon fi-teal">👁️</div><div><h4>Algılama</h4><p>Görüntü tanıma, ses tanıma, yüz algılama. Telefonunuzdaki yüz kilidi YZ kullanır.</p></div></div>
+        <div class="card feature-card reveal"><div class="feature-icon fi-beige">📚</div><div><h4>Öğrenme</h4><p>Veriden kalıplar çıkarma, deneyimden öğrenme. Netflix film önerileri buna örnektir.</p></div></div>
+        <div class="card feature-card reveal"><div class="feature-icon fi-teal">💬</div><div><h4>İletişim</h4><p>Doğal dil anlama ve üretme. ChatGPT, Siri, Google Asistan birer örnektir.</p></div></div>
+        <div class="card feature-card reveal"><div class="feature-icon fi-beige">🧩</div><div><h4>Problem Çözme</h4><p>Karmaşık problemlere çözüm bulma. Otonom araçlar, tıbbi teşhis sistemleri buna örnektir.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - YAPAY ZEKA NEDİR -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">İnsan beyni yaklaşık 86 milyar nöron içerir. GPT-4'ün yaklaşık 1.7 trilyon parametresi var — ama hâlâ bir çocuk kadar bile 'anlamıyor'.</p></div>
+</div>
+
+<!-- FELSEFİ TEMELLER -->
+<section id="philosophy" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-beige">KÖK ve TEMELLER</div>
+      <h2>Felsefi ve Matematiksel Temeller</h2>
+      <p class="section-desc">Yapay zekanın kökleri binlerce yıl öncesine uzanır</p>
+    </div>
+    <div class="grid-2">
+      <div class="card pioneer-card reveal">
+        <div class="pioneer-badge badge-purple">MÖ 384 — 322</div>
+        <h3>Aristo</h3>
+        <p class="pioneer-role">Antik Yunan Filozofu</p>
+        <p>Mantık ve akıl yürütme kurallarını sistemleştiren ilk düşünür. "Kıyas" (syllogism) adını verdiği mantık yapısı, makinelerin "düşünme" temellerini attı. Örneğin: "Tüm insanlar ölümlüdür. Sokrates insandır. Öyleyse Sokrates ölümlüdür." Bu tür mantık zincirleri, bilgisayar algoritmalarının temelini oluşturur.</p>
+      </div>
+      <div class="card pioneer-card reveal">
+        <div class="pioneer-badge badge-teal">1646 — 1716</div>
+        <h3>Gottfried Wilhelm Leibniz</h3>
+        <p class="pioneer-role">Alman Matematikçi ve Filozof</p>
+        <p>İkili (binary) sayı sistemi ve mekanik hesap makineleri ile hesaplamalı düşüncenin öncüsü oldu. Geliştirdiği "Stepped Reckoner" toplama, çıkarma, çarpma ve bölme yapabilen mekanik bir hesap makinesiydi. İkili sayı sistemi, bugün tüm dijital bilgisayarların temelini oluşturur.</p>
+      </div>
+      <div class="card pioneer-card reveal">
+        <div class="pioneer-badge badge-orange">1791 — 1871</div>
+        <h3>Charles Babbage</h3>
+        <p class="pioneer-role">İngiliz Matematikçi — "Bilgisayarın Babası"</p>
+        <p>Analitik Motor ile ilk programlanabilir bilgisayar kavramını geliştirdi. Bu makine; bellek birimi, işlem birimi, giriş/çıkış mekanizması ve koşullu dallanma gibi modern bilgisayarların temel bileşenlerine sahipti. Tam olarak inşa edilemese de kavramsal olarak devrim niteliğindeydi.</p>
+      </div>
+      <div class="card pioneer-card reveal">
+        <div class="pioneer-badge badge-green">1815 — 1852</div>
+        <h3>Ada Lovelace</h3>
+        <p class="pioneer-role">Tarihin İlk Bilgisayar Programcısı</p>
+        <p>Charles Babbage'in Analitik Motoru için ilk algoritmayı yazdı. Makinelerin sadece sayı hesaplamakla kalmayıp müzik besteleyebileceğini ve bilimsel analiz yapabileceğini öngördü. "Makine hiçbir şeyi yaratamaz, sadece ona ne yapacağını söyleyebiliriz" diyerek yapay zekanın sınırlarını tartışan ilk kişi oldu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - FELSEFİ TEMELLER -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Ada Lovelace, Lord Byron'ın (ünlü İngiliz şair) kızıydı. Edebiyat ve matematik arasında köprü kuran ilk kişi olarak bilinir.</p></div>
+</div>
+
+<!-- ALAN TURING -->
+<section id="turing" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">1950 — DÖNÜM NOKTASI</div>
+      <h2>Alan Turing ve Turing Testi</h2>
+      <p class="section-desc">"Makineler düşünebilir mi?" sorusunu soran ilk bilim insanı</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+      <div class="grid-2 inner-grid">
+        <div>
+          <h3>Alan Turing <span class="text-muted">(1912-1954)</span></h3>
+          <p style="margin-top:.75rem">1950 yılında yayımlanan "Computing Machinery and Intelligence" makalesinde <strong class="text-teal">"Makineler düşünebilir mi?"</strong> sorusunu sordu. Bu soru, tüm yapay zeka araştırmalarının temel motivasyonu haline geldi.</p>
+          <p style="margin-top:.75rem">İkinci Dünya Savaşı'nda Nazi Almanyası'nın Enigma şifresini kıran Turing, modern bilgisayar biliminin kurucusu olarak kabul edilir. Geliştirdiği "Turing Makinesi" kavramı, hesaplanabilirliğin matematiksel temelini oluşturur.</p>
+        </div>
+        <div class="turing-demo">
+          <h4 class="text-teal center">🔬 Turing Testi Nasıl Çalışır?</h4>
+          <div class="turing-grid">
+            <div class="turing-box"><div class="turing-emoji">🖥️</div><h4 class="text-teal">A. Makine</h4><p class="small text-muted">Yapay zeka sistemi</p></div>
+            <div class="turing-vs">?</div>
+            <div class="turing-box"><div class="turing-emoji">👤</div><h4 class="text-green">B. İnsan</h4><p class="small text-muted">Gerçek bir kişi</p></div>
+          </div>
+          <div class="turing-box" style="display:inline-block;min-width:200px;margin-top:.5rem">
+            <div class="turing-emoji">🧑‍⚖️</div><h4 class="text-orange">C. Değerlendirici</h4><p class="small text-muted">Hangisi makine, hangisi insan?</p>
+          </div>
+          <p class="small" style="margin-top:.75rem">Değerlendirici yazılı sohbet yoluyla hem makine hem insanla iletişim kurar. Eğer makineyi insandan ayırt edemezse, makine testi <strong class="text-green">geçmiş</strong> sayılır.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÇİN ODASI -->
+    <div style="margin-top:2.5rem">
+      <div class="section-header reveal">
+        <div class="chip chip-orange">FELSEFİ KARŞI ARGÜMAN</div>
+        <h2>Çin Odası Deneyi</h2>
+        <p class="section-desc">John Searle (1980) — Turing Testini sorgulayan düşünce deneyi</p>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500)">
+        <div class="room-steps">
+          <div class="room-step"><div class="step-num sn-teal">1</div><h4>Çince Soru</h4><p class="small">Bir odaya Çince yazılmış bir soru gönderilir. Odadaki kişi Çince bilmez.</p></div>
+          <div class="step-arrow">→</div>
+          <div class="room-step"><div class="step-num sn-orange">2</div><h4>Kural Kitabı</h4><p class="small">Kişi, elindeki detaylı kural kitabına bakarak hangi sembollere hangi yanıtı vereceğini bulur.</p></div>
+          <div class="step-arrow">→</div>
+          <div class="room-step"><div class="step-num sn-green">3</div><h4>Doğru Cevap</h4><p class="small">Dışarıdan bakıldığında Çince biliyor gibi görünür ama aslında hiçbir şey anlamıyordur.</p></div>
+        </div>
+        <div class="callout callout-orange center">
+          <strong>💭 Temel Soru:</strong> Makine doğru cevaplar üretebilir ama bu gerçekten "düşündüğü" anlamına gelir mi? Turing Testini geçmek, gerçek "anlama" anlamına gelmeyebilir.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - TURING -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Alan Turing'in 2. Dünya Savaşı'ndaki şifre kırma çalışmalarının savaşı 2 yıl kısalttığı ve 14 milyon insanın hayatını kurtardığı tahmin ediliyor.</p></div>
+</div>
+
+<!-- DARTMOUTH -->
+<section id="dartmouth" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-beige">1956 — DOĞUŞ</div>
+      <h2>Dartmouth Konferansı</h2>
+      <p class="section-desc">"Yapay Zeka" teriminin doğduğu ve alanın resmi olarak başladığı an</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--beige);margin-bottom:1.5rem">
+      <p style="font-size:1.05rem;font-weight:500">1956 yazında, Dartmouth College'da düzenlenen bu yaz çalıştayı, "yapay zeka" teriminin ilk kez kullanıldığı ve YZ'nin bağımsız bir akademik alan olarak doğduğu tarihi toplantıdır.</p>
+      <p class="text-secondary" style="margin-top:.5rem">John McCarthy'nin organize ettiği bu konferansa katılan bilim insanları, sonraki onlarca yılın YZ araştırmalarına yön verdi.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card founder-card reveal">
+        <div class="founder-avatar fa-teal">🎓</div>
+        <h3>John McCarthy</h3>
+        <p class="founder-years">1927 — 2011</p>
+        <p class="small">"Yapay zeka" terimini ortaya atan kişi. LISP programlama dilini geliştirdi. Stanford Yapay Zeka Laboratuvarı'nı kurdu.</p>
+      </div>
+      <div class="card founder-card reveal">
+        <div class="founder-avatar fa-beige">🔬</div>
+        <h3>Marvin Minsky</h3>
+        <p class="founder-years">1927 — 2016</p>
+        <p class="small">MIT Yapay Zeka Laboratuvarı'nı kurdu. Sinir ağları, robotik ve yapay zeka felsefesi üzerine çığır açan çalışmalar yaptı.</p>
+      </div>
+      <div class="card founder-card reveal">
+        <div class="founder-avatar fa-teal">📡</div>
+        <h3>Claude Shannon</h3>
+        <p class="founder-years">1916 — 2001</p>
+        <p class="small">Bilgi teorisinin kurucusu. "Bit" kavramını bilime kazandırdı. Dijital devre tasarımının temellerini attı.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - DARTMOUTH -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Dartmouth katılımcıları '10 yılda makineler satranç şampiyonunu yener' demişti. Gerçekte bu 41 yıl sürdü.</p></div>
+</div>
+
+<!-- İLK PROGRAMLAR -->
+<section id="programs" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">1960'LAR — İLK ADIMLAR</div>
+      <h2>İlk YZ Programları</h2>
+      <p class="section-desc">Teoriden pratiğe geçiş: ilk yapay zeka yazılımları</p>
+    </div>
+    <div class="tab-nav">
+      <button class="chip active" onclick="switchTab('eliza',this)">💬 ELIZA Sohbet Botu</button>
+      <button class="chip" onclick="switchTab('expert',this)">🖥️ Uzman Sistemler</button>
+    </div>
+    <div class="tab-content active" id="tab-eliza">
+      <div class="grid-2">
+        <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+          <h3 class="text-teal">ELIZA (1966)</h3>
+          <p class="text-muted small" style="margin-bottom:.5rem">Joseph Weizenbaum — MIT</p>
+          <p>Tarihin ilk sohbet botu. Bir psikoterapist gibi davranarak insanlarla sohbet ediyordu.</p>
+          <p style="margin-top:.5rem">Gerçekte hiçbir şeyi "anlamıyordu" — kullanıcıların anahtar kelimelerini yakalayıp önceden belirlenmiş kalıplara göre yanıt veriyordu.</p>
+          <div class="callout callout-teal" style="margin-top:.75rem">
+            <strong>🤔 İlginç Gerçek:</strong> Weizenbaum'un sekreteri, ELIZA'nın gerçek bir terapist olmadığını bilmesine rağmen, onunla özel konuşmalar yapmak istedi. Bu "ELIZA Etkisi" olarak bilinir.
+          </div>
+        </div>
+        <div class="reveal">
+          <h4 class="center" style="margin-bottom:.5rem">🤖 ELIZA ile Sohbet Edin!</h4>
+          <p class="center small text-muted" style="margin-bottom:.75rem">1966 tarzı basit kalıp eşleştirme ile</p>
+          <div class="chat-sim card">
+            <div class="chat-header">ELIZA — Sanal Terapist 🧠</div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg bot">Merhaba, ben ELIZA. Size nasıl yardımcı olabilirim? Kendinizi nasıl hissediyorsunuz?</div>
+            </div>
+            <div class="chat-input-area">
+              <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter')sendEliza()">
+              <button onclick="sendEliza()">Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-expert">
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500);margin-bottom:1.5rem">
+        <h3 class="text-orange">Uzman Sistemler (1960'lar — 1980'ler)</h3>
+        <p style="margin-top:.5rem">Belirli alanlarda insan uzmanlarının bilgisini "eğer-ise" kurallarıyla taklit eden sistemler. Yapay zekanın gerçek dünya problemlerini çözebileceğini ilk kez kanıtladı.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card card-bordered reveal" style="border-left:4px solid var(--red-500)">
+          <h3 class="text-red">MYCIN</h3>
+          <p class="text-muted small">Stanford Üniversitesi — 1972</p>
+          <p style="margin-top:.5rem">Kan enfeksiyonlarından kaynaklanan bakterileri teşhis etmek ve uygun antibiyotikleri önermek için geliştirildi. 600 civarında "eğer-ise" kuralı içeriyordu.</p>
+          <div class="mini-stats"><div class="mini-stat"><span class="ms-num text-red">600+</span><span class="ms-lbl">Kural</span></div><div class="mini-stat"><span class="ms-num text-red">%69</span><span class="ms-lbl">Doğruluk</span></div></div>
+        </div>
+        <div class="card card-bordered reveal" style="border-left:4px solid var(--green-500)">
+          <h3 class="text-green">DENDRAL</h3>
+          <p class="text-muted small">Stanford Üniversitesi — 1965</p>
+          <p style="margin-top:.5rem">Kimyasal bileşiklerin moleküler yapısını kütle spektrometresi verilerinden analiz eden ilk uzman sistem.</p>
+          <div class="mini-stats"><div class="mini-stat"><span class="ms-num text-green">1965</span><span class="ms-lbl">İlk Uzman Sistem</span></div><div class="mini-stat"><span class="ms-num text-green">20+</span><span class="ms-lbl">Yıl Aktif</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - İLK PROGRAMLAR -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">ELIZA o kadar ikna ediciydi ki bazı psikiyatristler, bilgisayar terapistlerinin insan terapistlerin yerini alabileceğini ciddi ciddi tartıştı.</p></div>
+</div>
+
+<!-- YZ KIŞI -->
+<section id="winter" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-blue">❄️ 1970'LER — 1990'LAR</div>
+      <h2>Yapay Zeka Kışı</h2>
+      <p class="section-desc">Hayal kırıklığı, fonlama kesintisi ve durgunluk dönemi</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--blue-500);margin-bottom:1.5rem">
+      <p style="font-weight:500">Uzman sistemler endüstride büyük ilgi gördü ancak bilgi tabanlarını oluşturmanın ve sürdürmenin zorluğu, esneklik eksikliği nedeniyle beklentileri tam olarak karşılayamadı.</p>
+      <p class="text-secondary" style="margin-top:.5rem">Bu durum, YZ araştırmalarında <strong class="text-blue">"Yapay Zeka Kışı"</strong> (AI Winter) olarak bilinen bir döneme yol açtı.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal" style="border-top:3px solid var(--red-500)"><div style="font-size:2rem;margin-bottom:.5rem">📈</div><h4 class="text-red">Aşırı Beklentiler</h4><p class="small" style="margin-top:.5rem">YZ'nin kısa sürede insanlar kadar zeki olacağı vaatleri gerçekleşmedi.</p></div>
+      <div class="card reveal" style="border-top:3px solid var(--orange-500)"><div style="font-size:2rem;margin-bottom:.5rem">⚙️</div><h4 class="text-orange">Teknik Sınırlar</h4><p class="small" style="margin-top:.5rem">Bilgisayar işlem gücü ve veri miktarı yetersizdi.</p></div>
+      <div class="card reveal" style="border-top:3px solid var(--blue-500)"><div style="font-size:2rem;margin-bottom:.5rem">💰</div><h4 class="text-blue">Fonlama Kesintisi</h4><p class="small" style="margin-top:.5rem">İngiltere'de Lighthill Raporu (1973) ve ABD'de DARPA desteği büyük ölçüde azalttı.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - YZ KIŞI -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">İngiltere'de yayınlanan Lighthill Raporu o kadar yıkıcıydı ki BBC'de canlı yayınlandı ve YZ araştırmacıları 'savaş suçlusu' muamelesi gördü.</p></div>
+</div>
+
+<!-- PERCEPTRON -->
+<section id="perceptron" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-purple">1958 — İLK SINIR AĞI</div>
+      <h2>Perceptron: Yapay Nöron</h2>
+      <p class="section-desc">Frank Rosenblatt'ın en basit yapay sinir ağı — ve sınırları</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--purple-500);margin-bottom:1.5rem">
+      <p style="font-size:1.05rem;font-weight:500">Perceptron, Frank Rosenblatt tarafından 1958 yılında geliştirilen, yapay sinir ağlarının en temel şeklidir. Bir giriş katmanı, ağırlıklar ve bir çıkış olmakla basit olsa da, "makine öğrenmesi"nin prototipiydi.</p>
+      <p class="text-secondary" style="margin-top:.5rem">Perceptron basit doğrusal problemleri çözbilir: Bir çizgi çizerek iki grubu (sınıf) ayırabilir.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal" style="border-top:3px solid var(--green-500)">
+        <h3 class="text-green">✅ Perceptron Başarabileceği</h3>
+        <p style="margin-top:.5rem">Perceptron, <strong>doğrusal olarak ayrılabilir</strong> problemleri çözebilir:</p>
+        <div class="feature-stack" style="margin-top:1rem">
+          <div style="padding:.5rem 0;border-bottom:1px solid var(--gray-100)">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">AND Kapısı</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">Giriş: (0,0)→Çıkış:0 | (0,1)→0 | (1,0)→0 | (1,1)→1</p>
+          </div>
+          <div style="padding:.5rem 0;border-bottom:1px solid var(--gray-100)">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">OR Kapısı</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">Giriş: (0,0)→Çıkış:0 | (0,1)→1 | (1,0)→1 | (1,1)→1</p>
+          </div>
+        </div>
+        <p class="small text-secondary" style="margin-top:1rem">Tek bir çizgi ile iki grubu ayırmak yeterlidir.</p>
+      </div>
+      <div class="card reveal" style="border-top:3px solid var(--red-500)">
+        <h3 class="text-red">❌ Perceptron'un Sınırı</h3>
+        <p style="margin-top:.5rem">Perceptron <strong>doğrusal olarak ayrılamayan</strong> problemleri çözemez:</p>
+        <div class="feature-stack" style="margin-top:1rem">
+          <div style="padding:.5rem 0;border-bottom:1px solid var(--gray-100)">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">XOR Kapısı ❌</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">(0,0)→0 | (0,1)→1 | (1,0)→1 | (1,1)→0</p>
+          </div>
+        </div>
+        <div class="callout callout-red" style="margin-top:.75rem">
+          <strong>Sorun:</strong> XOR'da hiçbir tek düz çizgi iki grubu ayıramaz! Çapraz bir örüntü gereklidir.
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:2rem">
+      <div class="section-header reveal">
+        <div class="chip chip-teal">İNTERAKTİF</div>
+        <h2>🎮 Perceptron Oyun Alanı</h2>
+        <p class="section-desc">Farklı veri setleriyle bir çizgi çizerek noktaları ayırmayı deneyin!</p>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+        <div class="grid-2 inner-grid">
+          <div class="perceptron-canvas-wrap card"><canvas id="perceptronCanvas" width="360" height="360"></canvas></div>
+          <div>
+            <h4 class="text-teal" style="margin-bottom:.75rem">Kontroller</h4>
+            <div style="display:flex;gap:.5rem;flex-direction:column;margin-bottom:1rem">
+              <button class="chip active" onclick="setPerceptronDataset('and',this)">AND Kapısı</button>
+              <button class="chip" onclick="setPerceptronDataset('or',this)">OR Kapısı</button>
+              <button class="chip" onclick="setPerceptronDataset('xor',this)">XOR Kapısı</button>
+            </div>
+            <p class="small text-secondary" style="margin-bottom:.75rem">Çizgi çizmek için canvas üzerinde fare ile çizin.</p>
+            <div style="background:var(--gray-50);padding:1rem;border-radius:.75rem;margin-bottom:1rem">
+              <p class="small text-secondary" style="margin-bottom:.5rem"><strong>Doğruluk:</strong></p>
+              <p id="perceptronAccuracy" style="font-size:1.3rem;font-weight:700;color:var(--teal)">-%</p>
+            </div>
+            <button class="btn-primary" onclick="resetPerceptronCanvas()" style="width:100%">Sıfırla</button>
+            <p id="perceptronMsg" class="small text-secondary" style="margin-top:.75rem;text-align:center"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:2rem">
+      <div class="callout callout-orange">
+        <strong>🔑 Anahtar Kavram:</strong> Perceptron'un XOR'u çözememe sorunu, araştırmacıları çok katmanlı sinir ağları (multi-layer perceptrons) geliştirmeye itmiştir. Bu, Geri Yayılım algoritmasının ihtiyacını doğurdu.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - PERCEPTRON -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Rosenblatt, perceptron hakkında bu kadar iyimser konuştu ki, Amerikan Navy bile destekleme kararı aldı. Ama 1969'da Minsky ve Papert, matematiksel olarak onun sınırlarını kanıtladı ve fonlama kesintiye uğradı.</p></div>
+</div>
+
+<!-- GERİ YAYILIM -->
+<section id="backprop" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">1986 — YENİDEN DOĞUŞ</div>
+      <h2>Geri Yayılım ve Sinir Ağları</h2>
+      <p class="section-desc">Yapay sinir ağları, öğrenmeyi öğreniyor</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+      <div class="grid-2 inner-grid">
+        <div>
+          <h3>Backpropagation (Geri Yayılım)</h3>
+          <p style="margin-top:.75rem">1986'da Rumelhart, Hinton ve Williams tarafından popülerleştirilen geri yayılım algoritması, yapay sinir ağlarının karmaşık kalıpları öğrenme yeteneğini artırdı.</p>
+          <p style="margin-top:.75rem"><strong class="text-teal">Nasıl çalışır?</strong> Sinir ağı bir tahmin yapar, hatasını hesaplar, sonra bu hatayı geriye doğru katmanlara yayarak ağırlıkları günceller. Böylece her denemede biraz daha iyi olur.</p>
+        </div>
+        <div>
+          <h4 class="text-teal center">🧬 İnteraktif Sinir Ağı</h4>
+          <p class="center small text-muted" style="margin-bottom:.5rem">Düğümlere tıklayarak sinyali gözlemleyin</p>
+          <div class="nn-canvas-wrap card"><canvas id="nnCanvas" width="640" height="360"></canvas></div>
+          <div class="nn-controls">
+            <button class="chip active" onclick="setNNMode('forward',this)">İleri Yayılım</button>
+            <button class="chip" onclick="setNNMode('backward',this)">Geri Yayılım</button>
+            <button class="chip" onclick="resetNN()">Sıfırla</button>
+          </div>
+          <p id="nnStatus" class="center small text-muted" style="margin-top:.5rem;min-height:1.5em"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - GERİ YAYILIM -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Geoffrey Hinton, 'yapay zekanın babası' olarak bilinir. 2024'te Nobel Fizik Ödülü'nü kazandı — fizikçi olmamasına rağmen!</p></div>
+</div>
+
+<!-- MAKİNE ÖĞRENMESİ TÜRLERİ -->
+<section id="mltypes" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">SINIFLANDIRMA</div>
+      <h2>Makine Öğrenmesi Türleri</h2>
+      <p class="section-desc">Makineler nasıl öğrenir? Üç ana yolu vardır</p>
+    </div>
+    <div class="grid-3">
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🏷️</div>
+        <h3 class="text-teal">Denetimli Öğrenme</h3>
+        <p class="small text-secondary" style="margin:.5rem 0;font-style:italic">Labeled Data ile Öğrenme</p>
+        <p style="margin-top:.75rem">Makine, "eğitim sırasında" doğru cevapları öğrenmiş veri kullanır. Verilere etiketler (labels) yapıştırılmıştır.</p>
+        <div style="margin-top:1rem;padding:1rem;background:var(--gray-50);border-radius:.75rem">
+          <p class="small" style="margin-bottom:.5rem"><strong>Örnekler:</strong></p>
+          <ul style="font-size:.85rem;color:var(--gray-600);list-position:inside;margin-top:.5rem;gap:.25rem;display:flex;flex-direction:column">
+            <li>🚨 Spam Filtresi</li>
+            <li>🖼️ Görüntü Tanıma</li>
+            <li>💰 Fiyat Tahmini</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--purple-500)">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🔍</div>
+        <h3 class="text-purple">Denetimsiz Öğrenme</h3>
+        <p class="small text-secondary" style="margin:.5rem 0;font-style:italic">Unlabeled Data'da Patern Bulma</p>
+        <p style="margin-top:.75rem">Makine, herhangi bir etiket olmadan verideki kalıpları ve grupları kendisi bulur. Gizli yapıyı keşfeder.</p>
+        <div style="margin-top:1rem;padding:1rem;background:var(--gray-50);border-radius:.75rem">
+          <p class="small" style="margin-bottom:.5rem"><strong>Örnekler:</strong></p>
+          <ul style="font-size:.85rem;color:var(--gray-600);list-position:inside;margin-top:.5rem;gap:.25rem;display:flex;flex-direction:column">
+            <li>👥 Müşteri Segmentasyonu</li>
+            <li>⚠️ Anomali Tespiti</li>
+            <li>🎵 Benzer İçerik Tavsiyesi</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500)">
+        <div style="font-size:2.5rem;margin-bottom:.75rem">🎮</div>
+        <h3 class="text-orange">Pekiştirmeli Öğrenme</h3>
+        <p class="small text-secondary" style="margin:.5rem 0;font-style:italic">Ödül ve Ceza ile Öğrenme</p>
+        <p style="margin-top:.75rem">Makine, deneme yanılma yoluyla öğrenir. İyi kararlar için ödül, kötü kararlar için ceza alır. Oyun oynayan çocuk gibi.</p>
+        <div style="margin-top:1rem;padding:1rem;background:var(--gray-50);border-radius:.75rem">
+          <p class="small" style="margin-bottom:.5rem"><strong>Örnekler:</strong></p>
+          <ul style="font-size:.85rem;color:var(--gray-600);list-position:inside;margin-top:.5rem;gap:.25rem;display:flex;flex-direction:column">
+            <li>♟️ Satranç Oynama (AlphaGo)</li>
+            <li>🤖 Robot Yürüyüşü</li>
+            <li>🎮 Oyun YZ'si</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:2rem">
+      <div class="card reveal" style="border-top:3px solid var(--purple-500)">
+        <h3 class="text-purple" style="margin-bottom:1rem">🔄 Hibridi Yaklaşım: YouTube Örneği</h3>
+        <p>YouTube'un öneri sistemi, her üç türü de kullanır:</p>
+        <div style="margin-top:1rem">
+          <div style="padding:.75rem 0;border-bottom:1px solid var(--gray-100)">
+            <p class="small"><strong>1. Denetimsiz:</strong> Milyonlarca videoyu benzerliklerine göre gruplar. Hangi videolar birbirine benzer?</p>
+          </div>
+          <div style="padding:.75rem 0;border-bottom:1px solid var(--gray-100)">
+            <p class="small"><strong>2. Denetimli:</strong> Eğitim verilerine (hangi videoları izlediğiniz, beğendiğiniz, önerilerle etkileşim) dayalı olarak sizin beğeneceğiniz videoları tahmin eder.</p>
+          </div>
+          <div style="padding:.75rem 0">
+            <p class="small"><strong>3. Pekiştirmeli:</strong> Sistemin önerileri ne kadar iyi olduğunu ve iyileştirilmesi gerekip gerekmediğini öğrenir.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - MAKİNE ÖĞRENMESİ TÜRLERİ -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">YouTube'un öneri sistemi denetimsiz öğrenme ile benzer videoları gruplar, sonra denetimli öğrenme ile hangisini izleyeceğinizi tahmin eder, pekiştirmeli öğrenme ile de tercihlerinizi iyileştirmeyi öğrenir.</p></div>
+</div>
+
+<!-- DEEP BLUE -->
+<section id="deepblue" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-red">1997 — TARİHİ MAÇ</div>
+      <h2>Deep Blue vs Kasparov</h2>
+      <p class="section-desc">Yapay zeka, insanlığın en iyi satranç oyuncusunu yendi</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--red-500)">
+      <div class="match-score">
+        <div class="score-side"><div class="score-emoji">🖥️</div><div class="score-name text-teal">IBM Deep Blue</div><p class="small text-muted">Saniyede 200 milyon pozisyon</p><div class="score-num text-teal">3.5</div></div>
+        <div class="score-vs">VS</div>
+        <div class="score-side"><div class="score-emoji">👑</div><div class="score-name text-orange">Garry Kasparov</div><p class="small text-muted">Dünya Satranç Şampiyonu</p><div class="score-num text-orange">2.5</div></div>
+      </div>
+      <p class="center" style="margin-top:1rem">IBM'in Deep Blue süper bilgisayarı, dünya satranç şampiyonu Garry Kasparov'u 6 maçlık seride yenerek tarih yazdı.</p>
+      <div class="callout callout-red center" style="margin-top:1rem">
+        <strong>⚡ Önemli Not:</strong> Deep Blue "düşünmüyordu" — kaba kuvvet hesaplama yapıyordu. Saniyede 200 milyon pozisyonu değerlendirerek en iyi hamleyi buluyordu.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - DEEP BLUE -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Kasparov, Deep Blue'nun bir hamlesinden o kadar şüphelendi ki IBM'i hile yapmakla suçladı. Yıllar sonra bunun aslında bir yazılım hatasından kaynaklandığı ortaya çıktı.</p></div>
+</div>
+
+<!-- DERİN ÖĞRENME -->
+<section id="deeplearning" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-green">2000'LER — 2010'LAR</div>
+      <h2>Büyük Veri ve Derin Öğrenme Devrimi</h2>
+      <p class="section-desc">Veri patlaması ve GPU'lar yapay zekayı yeniden canlandırdı</p>
+    </div>
+    <div class="grid-2" style="margin-bottom:1.5rem">
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+        <h3 class="text-teal">📊 Büyük Veri ve GPU'lar</h3>
+        <p style="margin-top:.5rem">İnternet ve dijitalleşme ile büyük miktarda veri oluşmaya başladı. GPU'ların paralel işlem yetenekleri, derin öğrenme algoritmalarının eğitimini hızlandırdı.</p>
+        <div class="mini-stats"><div class="mini-stat"><span class="ms-num text-teal">2.5</span><span class="ms-lbl">Exabyte/gün</span></div><div class="mini-stat"><span class="ms-num text-teal">100x</span><span class="ms-lbl">GPU hız artışı</span></div></div>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--green-500)">
+        <h3 class="text-green">🏆 ImageNet 2012</h3>
+        <p style="margin-top:.5rem">AlexNet modeli, ImageNet görüntü tanıma yarışmasında hata oranını dramatik şekilde düşürdü.</p>
+        <div class="bar-chart"><div class="bar-row"><div class="bar-fill bar-red" style="width:70%"></div><span class="bar-label">2011: %25.8 hata</span></div><div class="bar-row"><div class="bar-fill bar-green" style="width:45%"></div><span class="bar-label">2012: %16.4 hata (AlexNet)</span></div></div>
+      </div>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--purple-500)">
+      <div class="grid-2 inner-grid">
+        <div>
+          <h3 class="text-purple">🎯 AlphaGo vs Lee Sedol (2016)</h3>
+          <p style="margin-top:.5rem">Google DeepMind'ın AlphaGo'su, dünya Go şampiyonu Lee Sedol'u 4-1 yenerek tarihin en büyük YZ zaferlerinden birini kazandı.</p>
+          <p style="margin-top:.5rem"><strong class="text-purple">Neden önemli?</strong> Go, satrançtan çok daha karmaşık bir oyundur. Olası hamle sayısı evrendeki atom sayısından fazladır.</p>
+        </div>
+        <div class="mini-stats" style="flex-direction:column;gap:1rem">
+          <div class="mini-stat"><span class="ms-num text-teal">10<sup>47</sup></span><span class="ms-lbl">Satranç durumu</span></div>
+          <div class="mini-stat"><span class="ms-num text-purple">10<sup>170</sup></span><span class="ms-lbl">Go durumu</span></div>
+          <div class="mini-stat"><span class="ms-num text-green">4-1</span><span class="ms-lbl">AlphaGo galibiyeti</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - DERİN ÖĞRENME -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">AlphaGo'nun 37. hamlesi, 2000 yıllık Go tarihinde hiçbir insanın yapmayacağı bir hamleydi. Yorumcular 'güzel' ve 'ilahi' dedi.</p></div>
+</div>
+
+<!-- TRANSFORMER / DİKKAT MEKANİZMASI -->
+<section id="transformer" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-orange">2017 — DEVRIM</div>
+      <h2>Transformer: Dikkat Mekanizması</h2>
+      <p class="section-desc">"Attention Is All You Need" — Yapay zekayı yeniden tanımladı</p>
+    </div>
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500);margin-bottom:1.5rem">
+      <p style="font-size:1.05rem;font-weight:500">2017'de Google tarafından yayımlanan "Attention Is All You Need" makalesi, Transformer mimarisini tanıttı. Bu, dil işleme, görüntü işleme ve muhasır tüm YZ alanlarını dönüştürdü.</p>
+      <p class="text-secondary" style="margin-top:.5rem"><strong>Transformer'ın sırları:</strong> Özellikle RNN (Recurrent Neural Networks) olmadan, paralel işleme, uzun mesafe bağımlılıklarını çözemek, ve Self-Attention mekanizması.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal" style="border-top:3px solid var(--blue-500)">
+        <h3 class="text-blue">🧠 Self-Attention (Dikkat Mekanizması)</h3>
+        <p style="margin-top:.5rem">Model, bir metni okurken hangi kelimelere daha çok odaklanacağını öğrenir.</p>
+        <div class="feature-stack" style="margin-top:1rem">
+          <p class="small text-secondary"><strong>Örnek:</strong> "Çocuk bahçeye gitti çünkü hava güzeldi."</p>
+          <p class="small text-secondary" style="margin-top:.5rem">Model "çocuk" kelimesini işlerken, "bahçeye" ve "gitti" kelimelerine daha çok dikkat eder. Ama "çünkü" kelimesinde "hava" ve "güzeldi"ye fokus olur.</p>
+        </div>
+        <div class="callout callout-teal" style="margin-top:1rem">
+          <strong>💡 Benzetme:</strong> İnsan bir cümle okurken, bağlama göre hangi kelimelere daha çok dikkat edeceğini seçer. Transformer da bunu yapıyor!
+        </div>
+      </div>
+      <div class="card reveal" style="border-top:3px solid var(--green-500)">
+        <h3 class="text-green">⚡ Transformer'ın Avantajları</h3>
+        <div class="feature-stack" style="margin-top:.75rem">
+          <div style="padding:.5rem 0;border-bottom:1px solid var(--gray-100)">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">Paralel İşleme</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">RNN'ler sırayla işler (yavaş). Transformer'lar hepsi aynı anda (hızlı) işler.</p>
+          </div>
+          <div style="padding:.5rem 0;border-bottom:1px solid var(--gray-100)">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">Uzun Mesafe Bağlantı</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">Cümlenin başı ve sonu arasındaki ilişkiyi daha iyi anlar.</p>
+          </div>
+          <div style="padding:.5rem 0">
+            <h4 style="font-size:.9rem;color:var(--gray-800)">Ölçekleme</h4>
+            <p class="small text-secondary" style="margin-top:.25rem">Daha büyük veri setleriyle, daha iyi sonuçlar elde edilir.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:2rem">
+      <div class="section-header reveal">
+        <div class="chip chip-orange">İNTERAKTİF</div>
+        <h2>👁️ Dikkat Görselleştirmesi</h2>
+        <p class="section-desc">Bir cümlede hangi kelimelere dikkat edildiğini görelim</p>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500)">
+        <p class="small text-secondary" style="margin-bottom:1rem">Cümledeki her kelimeye hover yapın. O kelimeyi işlerken diğer kelimelere ne kadar dikkat edildiğini (renk yoğunluğu) göreceksiniz.</p>
+        <div class="attention-viz" id="attentionViz"></div>
+        <p class="small text-secondary" style="margin-top:1rem;font-style:italic">Not: Bu bir eğitim gösterimidir. Gerçek Transformer'lar çok daha karmaşık yapıya sahiptir.</p>
+      </div>
+    </div>
+    <div style="margin-top:2rem">
+      <div class="card reveal" style="border-top:3px solid var(--yellow-500)">
+        <h3 class="text-yellow" style="margin-bottom:.75rem">🚀 Transformer'lar Sonrası</h3>
+        <div class="grid-3" style="gap:1rem;margin-top:1rem">
+          <div>
+            <p class="small"><strong class="text-teal">BERT (2018)</strong></p>
+            <p class="small text-secondary" style="margin-top:.25rem">Google'ın Transformer, önceden eğitilmiş dil anlama modeli</p>
+          </div>
+          <div>
+            <p class="small"><strong class="text-purple">GPT Serisi (2018+)</strong></p>
+            <p class="small text-secondary" style="margin-top:.25rem">OpenAI'nin üretken metin modeli. GPT-4 bugünün en güçlü modeli</p>
+          </div>
+          <div>
+            <p class="small"><strong class="text-orange">T5 / mT5 (2019)</strong></p>
+            <p class="small text-secondary" style="margin-top:.25rem">Google'ın metin-metin transfer modeli. Çeviriye iyi</p>
+          </div>
+        </div>
+        <p class="small text-secondary" style="margin-top:1rem"><strong>Sonuç:</strong> Transformer mimarisi, ChatGPT, DALL-E, Stable Diffusion, Claude ve daha birçok modern YZ'nin temelini oluşturuyor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - TRANSFORMER -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">Google'ın "Attention Is All You Need" makalesi sadece 6 sayfa. Ama tarihte en etkili YZ makalelerinden biri. 100,000+ atıf aldı.</p></div>
+</div>
+
+<!-- ÜRETKEN YZ -->
+<section id="genai" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-orange">2017 — GÜNÜMÜZ</div>
+      <h2>Üretken Yapay Zeka</h2>
+      <p class="section-desc">Metin, görsel, ses ve video üreten yapay zeka modelleri</p>
+    </div>
+    <div class="gpt-letters reveal">
+      <div class="gpt-letter"><div class="gpt-big text-teal">G</div><div class="gpt-word">Generative</div><div class="gpt-tr">Üretken</div></div>
+      <div class="gpt-letter"><div class="gpt-big text-purple">P</div><div class="gpt-word">Pre-Trained</div><div class="gpt-tr">Önceden Eğitilmiş</div></div>
+      <div class="gpt-letter"><div class="gpt-big text-orange">T</div><div class="gpt-word">Transformer</div><div class="gpt-tr">Dönüştürücü Mimari</div></div>
+    </div>
+    <div class="genai-flow reveal">
+      <div class="card genai-card" style="border-top:3px solid var(--teal)"><div class="genai-year text-teal">2017</div><h4>Transformer</h4><p class="small text-muted">Google'ın "Attention Is All You Need" makalesi.</p></div>
+      <div class="card genai-card" style="border-top:3px solid var(--purple-500)"><div class="genai-year text-purple">2020</div><h4>GPT-3</h4><p class="small text-muted">175 milyar parametreli devasa dil modeli.</p></div>
+      <div class="card genai-card" style="border-top:3px solid var(--green-500)"><div class="genai-year text-green">2022</div><h4>ChatGPT</h4><p class="small text-muted">5 günde 1 milyon kullanıcıya ulaştı.</p></div>
+      <div class="card genai-card" style="border-top:3px solid var(--orange-500)"><div class="genai-year text-orange">2023</div><h4>GPT-4 / Gemini</h4><p class="small text-muted">Multimodal büyük dil modelleri.</p></div>
+      <div class="card genai-card" style="border-top:3px solid var(--yellow-500)"><div class="genai-year text-yellow">2024+</div><h4>Video ve Agent AI</h4><p class="small text-muted">Sora, Claude, AI agent'lar.</p></div>
+    </div>
+    <h3 class="center reveal" style="margin-top:2rem;margin-bottom:1.5rem">Yapay Zekanın Uygulama Alanları</h3>
+    <div class="grid-3">
+      <div class="card app-card reveal"><div class="app-icon">🏥</div><h4>Sağlık</h4><p class="small text-muted">Hastalık teşhisi, ilaç keşfi, tıbbi görüntü analizi</p></div>
+      <div class="card app-card reveal"><div class="app-icon">🎓</div><h4>Eğitim</h4><p class="small text-muted">Kişiselleştirilmiş öğrenme, otomatik değerlendirme</p></div>
+      <div class="card app-card reveal"><div class="app-icon">🔬</div><h4>Bilim</h4><p class="small text-muted">AlphaFold, iklim modelleme, malzeme keşfi</p></div>
+      <div class="card app-card reveal"><div class="app-icon">🎨</div><h4>Sanat</h4><p class="small text-muted">DALL-E, Midjourney, müzik, video (Sora)</p></div>
+      <div class="card app-card reveal"><div class="app-icon">💼</div><h4>İş Dünyası</h4><p class="small text-muted">Otomasyon, veri analizi, müşteri hizmetleri</p></div>
+      <div class="card app-card reveal"><div class="app-icon">🏠</div><h4>Günlük Hayat</h4><p class="small text-muted">Sesli asistanlar, çeviri, navigasyon</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- BILIYOR MUYDUNUZ? - ÜRETKEN YZ -->
+<div class="card funfact reveal">
+  <span class="funfact-icon">💡</span>
+  <div><strong>Biliyor muydunuz?</strong><p class="small">ChatGPT, 5 günde 1 milyon kullanıcıya ulaştı. Instagram'ın aynı sayıya ulaşması 2.5 ay, Netflix'in 3.5 yıl sürmüştü.</p></div>
+</div>
+
+<!-- TÜRKİYE'DE YZ -->
+<section id="turkeyai" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-red">🇹🇷 TÜRKİYE</div>
+      <h2>Türkiye'de Yapay Zeka</h2>
+      <p class="section-desc">Türkiye'nin YZ ekosistemi hızla büyüyor</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal" style="border-top:3px solid var(--red-500)">
+        <div style="font-size:2rem;margin-bottom:.5rem">🎓</div>
+        <h4>Akademi</h4>
+        <p class="small" style="margin-top:.25rem">ODTÜ, Boğaziçi, İTÜ, Bilkent gibi üniversitelerde güçlü YZ araştırma grupları. TÜBİTAK destekli projeler artıyor.</p>
+      </div>
+      <div class="card reveal" style="border-top:3px solid var(--teal)">
+        <div style="font-size:2rem;margin-bottom:.5rem">🏢</div>
+        <h4>Girişimler</h4>
+        <p class="small" style="margin-top:.25rem">Peak Games, Insider, Getir gibi şirketler YZ teknolojilerini aktif kullanıyor. Türk YZ girişimleri global yatırım alıyor.</p>
+      </div>
+      <div class="card reveal" style="border-top:3px solid var(--orange-500)">
+        <div style="font-size:2rem;margin-bottom:.5rem">📋</div>
+        <h4>Ulusal Strateji</h4>
+        <p class="small" style="margin-top:.25rem">2021'de Ulusal Yapay Zeka Stratejisi yayımlandı. 2025 hedefleri: YZ'de küresel ilk 20'ye girmek.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZAMAN ÇİZELGESİ -->
+<section id="timeline" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-beige">GENEL BAKIŞ</div>
+      <h2>Yapay Zeka Zaman Çizelgesi</h2>
+      <p class="section-desc">Antik Çağ'dan günümüze yapay zekanın evrimi</p>
+    </div>
+    <div class="timeline reveal" id="timelineContainer"></div>
+  </div>
+</section>
+
+<!-- İNTERAKTİF ARAÇLAR -->
+<section id="interactive" class="content-section alt-bg">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-teal">🎮 İNTERAKTİF ARAÇLAR</div>
+      <h2>Öğren ve Keşfet</h2>
+      <p class="section-desc">Yapay zeka tarihini interaktif araçlarla keşfedin</p>
+    </div>
+
+    <!-- TURING SİMÜLATÖRÜ -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--teal);margin-bottom:2rem">
+      <h3 class="text-teal center">🔬 Turing Testi Simülatörü</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">İki sohbetten hangisinin yapay zeka olduğunu tahmin edin!</p>
+      <div id="turingGame">
+        <div class="turing-sim-grid">
+          <div class="card turing-sim-box" id="turingBoxA">
+            <h4 class="center">Sohbet A</h4>
+            <div class="turing-sim-msgs" id="turingMsgsA"></div>
+          </div>
+          <div class="card turing-sim-box" id="turingBoxB">
+            <h4 class="center">Sohbet B</h4>
+            <div class="turing-sim-msgs" id="turingMsgsB"></div>
+          </div>
+        </div>
+        <div class="center" style="margin-top:1rem">
+          <p class="small text-muted" id="turingQ">Hangisi yapay zeka?</p>
+          <div class="turing-btns">
+            <button class="btn-outline" onclick="guessTuring('A')">A Yapay Zeka</button>
+            <button class="btn-outline" onclick="guessTuring('B')">B Yapay Zeka</button>
+          </div>
+          <button class="chip chip-teal" onclick="newTuringRound()" style="margin-top:.75rem">Yeni Tur</button>
+          <p id="turingResult" class="turing-result"></p>
+          <p class="small text-muted" style="margin-top:.5rem">Skor: <span id="turingScore">0</span> / <span id="turingTotal">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLASHCARD -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--purple-500);margin-bottom:2rem">
+      <h3 class="text-purple center">🃏 Yapay Zeka Bilgi Kartları</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Kartlara tıklayarak cevabı görün</p>
+      <div class="flashcard-container" id="flashcardContainer">
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="flashcard-front" id="flashFront"></div>
+          <div class="flashcard-back" id="flashBack"></div>
+        </div>
+      </div>
+      <div class="center" style="margin-top:1rem">
+        <span class="small text-muted" id="flashProgress">1 / 12</span>
+        <div style="margin-top:.5rem;display:flex;gap:.5rem;justify-content:center">
+          <button class="chip" onclick="prevFlashcard()">← Önceki</button>
+          <button class="chip chip-teal" onclick="nextFlashcard()">Sonraki →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIRALAMA OYUNU -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--green-500);margin-bottom:2rem">
+      <h3 class="text-green center">📅 Zaman Sıralama Oyunu</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Olayları kronolojik sıraya dizin!</p>
+      <div id="sortGame">
+        <div id="sortItems" class="sort-items"></div>
+        <div class="center" style="margin-top:1rem">
+          <button class="btn-primary" onclick="checkSortOrder()">Sıralamayı Kontrol Et</button>
+          <button class="chip" onclick="resetSortGame()" style="margin-left:.5rem">Yeniden Başla</button>
+        </div>
+        <p id="sortResult" class="sort-result"></p>
+      </div>
+    </div>
+
+    <!-- GÜNLÜK HAYATTA YZ -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--blue-500);margin-bottom:2rem">
+      <h3 class="text-blue center">📱 Günlük Hayatta YZ Testi</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Bu teknolojilerden hangilerinde yapay zeka kullanılıyor?</p>
+      <div class="daily-ai-grid" id="dailyAIGrid"></div>
+      <div class="center" style="margin-top:1rem">
+        <button class="btn-primary" onclick="checkDailyAI()">Cevapları Kontrol Et</button>
+        <p id="dailyAIResult" class="sort-result"></p>
+      </div>
+    </div>
+
+    <!-- YZ Mİ İNSAN MI -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--orange-500);margin-bottom:2rem">
+      <h3 class="text-orange center">🎭 YZ mi İnsan mı?</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Aşağıdaki metin yapay zeka tarafından mı yoksa insan tarafından mı yazıldı?</p>
+      <div id="aiHumanGame">
+        <div class="card ai-human-text" id="aiHumanText" style="background:var(--gray-50);font-style:italic;padding:1.5rem;border-radius:.75rem;margin-bottom:1rem;min-height:100px"></div>
+        <div class="center">
+          <div style="display:flex;gap:.5rem;justify-content:center">
+            <button class="btn-outline" onclick="guessAIHuman('ai')">🤖 Yapay Zeka</button>
+            <button class="btn-outline" onclick="guessAIHuman('human')">✍️ İnsan</button>
+          </div>
+          <p id="aiHumanResult" style="margin-top:.75rem;font-weight:700"></p>
+          <button class="chip chip-teal" onclick="newAIHumanRound()" style="margin-top:.5rem">Yeni Metin</button>
+          <p class="small text-muted" style="margin-top:.5rem">Skor: <span id="ahScore">0</span> / <span id="ahTotal">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERCEPTRON OYUN ALANI (ANA SAYFA) -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--teal);margin-bottom:2rem">
+      <h3 class="text-teal center">🧠 Perceptron Playground</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">2D koordinat düzleminde bir çizgi çizerek noktaları ayırın!</p>
+      <div class="grid-2">
+        <div class="perceptron-canvas-wrap card"><canvas id="perceptronCanvasAlt" width="360" height="360"></canvas></div>
+        <div>
+          <h4 style="margin-bottom:.75rem">Veri Seti</h4>
+          <div style="display:flex;gap:.5rem;flex-direction:column;margin-bottom:1rem">
+            <button class="chip active" onclick="setPerceptronDatasetAlt('and',this)">AND Kapısı</button>
+            <button class="chip" onclick="setPerceptronDatasetAlt('or',this)">OR Kapısı</button>
+            <button class="chip" onclick="setPerceptronDatasetAlt('xor',this)">XOR Kapısı</button>
+          </div>
+          <p class="small text-secondary" style="margin-bottom:.75rem">Fare ile tuval üzerine çizgi çizin. Model otomatik doğruluk hesaplar.</p>
+          <div style="background:var(--gray-50);padding:1rem;border-radius:.75rem;margin-bottom:1rem">
+            <p class="small text-secondary" style="margin-bottom:.5rem"><strong>Doğruluk Oranı:</strong></p>
+            <p id="perceptronAccuracyAlt" style="font-size:1.5rem;font-weight:700;color:var(--teal)">0%</p>
+          </div>
+          <button class="btn-primary" onclick="resetPerceptronCanvasAlt()" style="width:100%">Sıfırla</button>
+          <p id="perceptronMsgAlt" class="small text-secondary" style="margin-top:.75rem;text-align:center"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAKİNE ÖĞRENMESİ SENARYO OYUNU -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--blue-500);margin-bottom:2rem">
+      <h3 class="text-blue center">🎮 Makine Öğrenmesi Senaryo Oyunu</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Senaryoyu okuyun ve hangi ML türünün uygun olduğunu seçin!</p>
+      <div id="mlGameContainer">
+        <div class="card" id="mlScenario" style="background:var(--gray-50);padding:1.5rem;border-radius:.75rem;margin-bottom:1.5rem;min-height:100px"></div>
+        <div class="ml-options" id="mlOptions" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem"></div>
+        <div id="mlResult" style="margin-top:1rem;display:none" class="callout"></div>
+        <div class="center" style="margin-top:1.5rem">
+          <button class="btn-primary" onclick="nextMLScenario()">Sonraki Senaryo</button>
+          <p class="small text-muted" style="margin-top:.75rem">Senaryo: <span id="mlNum">1</span> / 10</p>
+          <p class="small text-secondary" style="margin-top:.25rem">Puan: <span id="mlScore">0</span> / <span id="mlTotal">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETİK İKİLEMLER -->
+    <div class="card card-bordered reveal" style="border-top:3px solid var(--red-500)">
+      <h3 class="text-red center">⚖️ YZ Etik İkilemleri</h3>
+      <p class="center small text-muted" style="margin-bottom:1rem">Bu senaryolarda siz ne karar verirdiniz?</p>
+      <div id="ethicsGame">
+        <div class="card" id="ethicsScenario" style="background:var(--gray-50);padding:1.5rem;border-radius:.75rem;margin-bottom:1rem"></div>
+        <div class="ethics-options" id="ethicsOptions"></div>
+        <div id="ethicsExplain" style="margin-top:1rem;display:none" class="callout"></div>
+        <div class="center" style="margin-top:1rem">
+          <button class="chip chip-teal" onclick="nextEthics()">Sonraki Senaryo</button>
+          <p class="small text-muted" style="margin-top:.5rem">Senaryo: <span id="ethicsNum">1</span> / 5</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GÜÇLÜ YZ VS ZAYIF YZ -->
+<section id="ailevels" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-purple">YZ TÜRLERİ</div>
+      <h2>Güçlü YZ vs Zayıf YZ</h2>
+      <p class="section-desc">Tüm yapay zekalar eşit yaratılmamıştır</p>
+    </div>
+    <div class="grid-2">
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--teal)">
+        <h3 class="text-teal">🎯 Dar (Zayıf) Yapay Zeka</h3>
+        <p class="small text-muted" style="margin-bottom:.5rem">Bugün sahip olduğumuz tüm YZ</p>
+        <p>Belirli bir görevi çok iyi yapan ama sadece o görevi yapabilen sistemler. Siri size hava durumunu söyleyebilir ama yemek tarifi yazamaz (o ayrı bir model).</p>
+        <div class="callout callout-teal" style="margin-top:.75rem">
+          <strong>Örnekler:</strong> ChatGPT, Google Çeviri, Spotify önerileri, Tesla Autopilot, yüz tanıma
+        </div>
+      </div>
+      <div class="card card-bordered reveal" style="border-top:3px solid var(--purple-500)">
+        <h3 class="text-purple">🧠 Genel (Güçlü) Yapay Zeka</h3>
+        <p class="small text-muted" style="margin-bottom:.5rem">Henüz mevcut değil — araştırma aşamasında</p>
+        <p>İnsan gibi her konuda düşünebilen, öğrenebilen ve problem çözebilen bir sistem. Hem matematik yapabilir hem şiir yazabilir hem de duygusal zeka gösterebilir.</p>
+        <div class="callout" style="margin-top:.75rem;border-left-color:var(--purple-500);background:#faf5ff">
+          <strong>Durum:</strong> Uzmanların %50'si 2060'a kadar, %90'ı 2100'e kadar gerçekleşeceğini tahmin ediyor
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="content-section">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div class="chip chip-green">🎯 KENDİNİ TEST ET</div>
+      <h2>Yapay Zeka Tarihçesi Quiz</h2>
+      <p class="section-desc">Öğrendiklerini test etmeye hazır mısın?</p>
+    </div>
+    <div class="quiz-container card card-bordered reveal" style="border-top:3px solid var(--green-500)">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizArea">
+        <div class="quiz-q" id="quizQuestion"></div>
+        <div class="quiz-opts" id="quizOpts"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <button class="btn-primary quiz-next" id="quizNext" onclick="nextQuestion()">Sonraki Soru →</button>
+      </div>
+      <div class="quiz-result" id="quizResult">
+        <div class="quiz-big-score" id="quizScoreDisplay"></div>
+        <div class="quiz-score-text" id="quizScoreText"></div>
+        <button class="btn-outline" onclick="startQuiz()" style="margin-top:1.5rem">Tekrar Dene</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GELECEK -->
+<section id="future" class="content-section alt-bg">
+  <div class="section-wrap center">
+    <div class="reveal">
+      <h2 style="font-size:2rem">Sizce Gelecekte Yapay Zeka<br><span class="text-orange">Neler Yapabilir?</span></h2>
+      <p class="text-muted" style="max-width:600px;margin:1rem auto">Yapay zeka hangi sorunları çözebilir? Hangi alanlarda insan zekasının yerini alamaz?</p>
+    </div>
+    <div class="grid-4 reveal" style="margin-top:1.5rem">
+      <div class="card thought-card" onclick="this.classList.toggle('selected')"><div style="font-size:2rem">🌍</div><h4>İklim Krizi</h4><p class="small text-muted">Daha iyi iklim modelleri, enerji optimizasyonu</p></div>
+      <div class="card thought-card" onclick="this.classList.toggle('selected')"><div style="font-size:2rem">💊</div><h4>Sağlık Devrimi</h4><p class="small text-muted">Kişiselleştirilmiş tedavi, erken teşhis</p></div>
+      <div class="card thought-card" onclick="this.classList.toggle('selected')"><div style="font-size:2rem">🤖</div><h4>Genel Yapay Zeka</h4><p class="small text-muted">İnsan seviyesinde düşünme (AGI)</p></div>
+      <div class="card thought-card" onclick="this.classList.toggle('selected')"><div style="font-size:2rem">⚖️</div><h4>Etik ve Güvenlik</h4><p class="small text-muted">Adil, güvenli ve sorumlu YZ</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Yapay Zeka Yıldızları</strong> — Habitat | Vodafone Vakfı</p>
+  <p class="small text-muted">Düşünceden Dijital Zekaya: Yapay Zekanın Evrimi</p>
+</footer>
+
+<script>
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== NAV SCROLL & ACTIVE =====
+window.addEventListener('scroll', () => {
+  const sections = document.querySelectorAll('section[id]');
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+// Close mobile nav on link click
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('open'));
+});
+
+// ===== TABS =====
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-nav .chip').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== ELIZA =====
+const elizaPatterns = [
+  [/\b(anne|baba|aile|kardeş)\b/i, "Aileniz hakkında daha fazla anlatır mısınız?"],
+  [/\b(üzgün|mutsuz|kötü|depresyon|ağlıyorum)\b/i, "Neden kendinizi böyle hissediyorsunuz?"],
+  [/\b(mutlu|iyi|güzel|harika|süper)\b/i, "Bu harika! Sizi mutlu eden ne?"],
+  [/\b(kork|endişe|kaygı|stres)\b/i, "Sizi endişelendiren şey hakkında konuşalım."],
+  [/\b(neden|niçin)\b/i, "Sizce bunun sebebi ne olabilir?"],
+  [/\b(evet)\b/i, "Anladım. Biraz daha açıklar mısınız?"],
+  [/\b(hayır)\b/i, "Peki, neden böyle düşünüyorsunuz?"],
+  [/\b(yapay zeka|robot|bilgisayar)\b/i, "Yapay zeka hakkında ne düşünüyorsunuz?"],
+  [/\b(merhaba|selam|hey)\b/i, "Merhaba! Bugün kendinizi nasıl hissediyorsunuz?"],
+  [/\b(teşekkür)\b/i, "Rica ederim! Başka neler konuşmak istersiniz?"],
+  [/\b(rüya|hayal)\b/i, "Rüyalar ilginçtir. Bu size ne hissettiriyor?"],
+  [/\b(seviyorum|aşk|sevgi)\b/i, "Sevgi güçlü bir duygu. Daha fazla anlatır mısınız?"],
+  [/\b(okul|ders|sınav|öğretmen)\b/i, "Okul hayatınız hakkında neler söylersiniz?"],
+  [/\b(arkadaş|dost)\b/i, "Arkadaşlarınız hakkında biraz anlatır mısınız?"]
+];
+const elizaDefaults = ["Anlıyorum. Devam edin lütfen.", "Bu ilginç. Biraz daha açıklar mısınız?", "Hmm, bu konuda ne düşünüyorsunuz?", "Devam edin, sizi dinliyorum.", "Bu konuyu biraz daha derinleştirelim.", "Peki, bu sizi nasıl hissettiriyor?"];
+
+function elizaReply(msg) {
+  for (const [p, r] of elizaPatterns) { if (p.test(msg)) return r; }
+  return elizaDefaults[Math.floor(Math.random() * elizaDefaults.length)];
+}
+
+function sendEliza() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim(); if (!msg) return;
+  const chat = document.getElementById('chatMessages');
+  chat.innerHTML += '<div class="chat-msg user">' + msg + '</div>';
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    chat.innerHTML += '<div class="chat-msg bot">' + elizaReply(msg) + '</div>';
+    chat.scrollTop = chat.scrollHeight;
+  }, 400 + Math.random() * 400);
+}
+
+// ===== NEURAL NETWORK =====
+let nnMode = 'forward';
+const canvas = document.getElementById('nnCanvas');
+const ctx = canvas.getContext('2d');
+let nnNodes = [], nnConns = [];
+let nnAnimationFrameId = null;
+let nnStartTime = 0;
+
+function initNN() {
+  const w = canvas.width, h = canvas.height;
+  nnNodes = []; nnConns = [];
+  const layers = [[3, w * 0.15], [4, w * 0.38], [4, w * 0.62], [2, w * 0.85]];
+  const colors = ['#22495A', '#8b5cf6', '#8b5cf6', '#22c55e'];
+  const labels = [['Giriş 1', 'Giriş 2', 'Giriş 3'], ['Gizli 1', 'Gizli 2', 'Gizli 3', 'Gizli 4'], ['Gizli 5', 'Gizli 6', 'Gizli 7', 'Gizli 8'], ['Çıkış 1', 'Çıkış 2']];
+
+  layers.forEach(([count, x], li) => {
+    const spacing = h / (count + 1);
+    for (let i = 0; i < count; i++) {
+      nnNodes.push({
+        x, y: spacing * (i + 1), r: 14, color: colors[li],
+        layer: li, active: 0, label: labels[li][i],
+        pulseAnim: 0  // for output node pulsing in backward mode
+      });
+    }
+  });
+
+  for (let li = 0; li < layers.length - 1; li++) {
+    const from = nnNodes.filter(n => n.layer === li);
+    const to = nnNodes.filter(n => n.layer === li + 1);
+    from.forEach(f => to.forEach(t => {
+      // Generate random weight between -1 and 1, rounded to 1 decimal
+      const weight = (Math.random() * 2 - 1).toFixed(1);
+      nnConns.push({
+        from: f, to: t, signal: 0,
+        progress: 0,  // 0 to 1, smooth animation progress
+        weight: weight,
+        flashWeight: 0  // 0 to 1, for weight label flash on backward
+      });
+    }));
+  }
+  drawNN();
+}
+
+function drawNN() {
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#f9fafb'; ctx.fillRect(0, 0, w, h);
+  ctx.beginPath(); ctx.roundRect(0, 0, w, h, 8); ctx.clip();
+  ctx.fillStyle = '#f9fafb'; ctx.fillRect(0, 0, w, h);
+
+  // Draw connections and animated dots
+  nnConns.forEach(c => {
+    // Connection line
+    ctx.beginPath(); ctx.moveTo(c.from.x, c.from.y); ctx.lineTo(c.to.x, c.to.y);
+    if (c.signal > 0) {
+      ctx.strokeStyle = nnMode === 'forward' ? 'rgba(34,73,90,' + c.signal + ')' : 'rgba(239,68,68,' + c.signal + ')';
+      ctx.lineWidth = 1.5 + c.signal * 2;
+    } else {
+      ctx.strokeStyle = 'rgba(209,213,219,0.4)';
+      ctx.lineWidth = 1;
+    }
+    ctx.stroke();
+
+    // Animated signal dot (smooth animation with requestAnimationFrame)
+    if (c.signal > 0) {
+      const prog = c.progress;  // Use smooth progress instead of signal
+      const dx = c.to.x - c.from.x, dy = c.to.y - c.from.y;
+      const sx = nnMode === 'forward' ? c.from.x + dx * prog : c.to.x - dx * prog;
+      const sy = nnMode === 'forward' ? c.from.y + dy * prog : c.to.y - dy * prog;
+      ctx.beginPath(); ctx.arc(sx, sy, 3 + c.signal * 2, 0, Math.PI * 2);
+      ctx.fillStyle = nnMode === 'forward' ? '#22495A' : '#ef4444';
+      ctx.fill();
+
+      // Draw weight label on connection with flash effect (backward mode)
+      if (nnMode === 'backward' && c.flashWeight > 0) {
+        const mx = c.from.x + dx * 0.5, my = c.from.y + dy * 0.5;
+        ctx.fillStyle = 'rgba(239,68,68,' + (c.flashWeight * 0.8) + ')';
+        ctx.font = '400 7px Outfit';
+        ctx.textAlign = 'center';
+        ctx.fillText(c.weight, mx, my - 8);
+      }
+    }
+  });
+
+  // Draw nodes with pulse animation for output layer in backward mode
+  nnNodes.forEach(n => {
+    // Glow halo for active nodes
+    if (n.active > 0) {
+      const grad = ctx.createRadialGradient(n.x, n.y, n.r, n.x, n.y, n.r * 2.5);
+      grad.addColorStop(0, n.color + '40');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Output node pulse animation in backward mode
+    if (nnMode === 'backward' && n.layer === 3 && n.pulseAnim > 0) {
+      ctx.beginPath();
+      const pulseRadius = n.r + n.pulseAnim * 6;
+      ctx.arc(n.x, n.y, pulseRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(34, 197, 94, ' + (1 - n.pulseAnim) * 0.6 + ')';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Node circle
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = n.active > 0 ? n.color : '#fff';
+    ctx.strokeStyle = n.active > 0 ? n.color : '#d1d5db';
+    ctx.lineWidth = 2;
+    ctx.fill();
+    ctx.stroke();
+
+    // Node label
+    ctx.fillStyle = n.active > 0 ? '#fff' : '#9ca3af';
+    ctx.font = '500 8px Outfit';
+    ctx.textAlign = 'center';
+    ctx.fillText(n.label, n.x, n.y + n.r + 12);
+  });
+
+  // Layer names
+  const layerNames = ['Giriş', 'Gizli Katman 1', 'Gizli Katman 2', 'Çıkış'];
+  const layerXs = [w * 0.15, w * 0.38, w * 0.62, w * 0.85];
+  ctx.font = '600 10px Outfit';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#9ca3af';
+  layerXs.forEach((x, i) => { ctx.fillText(layerNames[i], x, h - 6); });
+}
+
+function animateNN(currentTime) {
+  if (nnStartTime === 0) nnStartTime = currentTime;
+  const elapsed = currentTime - nnStartTime;
+
+  // Animation duration: 400ms per layer for smooth progression
+  const SEGMENT_DURATION = 400;
+
+  let hasActiveAnimation = false;
+
+  nnConns.forEach(c => {
+    if (c.signal > 0) {
+      hasActiveAnimation = true;
+      // Smooth progress from 0 to 1 over SEGMENT_DURATION ms
+      const progress = Math.min(1, elapsed / SEGMENT_DURATION);
+      c.progress = progress;
+
+      // Fade signal when animation completes
+      if (progress >= 1) {
+        c.signal = 0;
+        c.progress = 0;
+      }
+    }
+
+    // Fade weight flash effect
+    if (c.flashWeight > 0) {
+      c.flashWeight -= 0.02;
+      hasActiveAnimation = true;
+    }
+  });
+
+  // Animate output node pulse in backward mode
+  nnNodes.forEach(n => {
+    if (nnMode === 'backward' && n.layer === 3 && n.pulseAnim > 0) {
+      n.pulseAnim -= 0.04;
+      hasActiveAnimation = true;
+    }
+  });
+
+  drawNN();
+
+  // Continue animation if there are active animations
+  if (hasActiveAnimation) {
+    nnAnimationFrameId = requestAnimationFrame(animateNN);
+  } else {
+    nnAnimationFrameId = null;
+    nnStartTime = 0;
+  }
+}
+
+function activateNode(node) {
+  // In backward mode, only output layer nodes can initiate
+  if (nnMode === 'backward' && node.layer !== 3) {
+    return;
+  }
+
+  node.active = 1;
+  const outConns = nnConns.filter(c => nnMode === 'forward' ? c.from === node : c.to === node);
+
+  if (outConns.length > 0) {
+    // Start animation loop if not already running
+    if (nnAnimationFrameId === null) {
+      nnStartTime = 0;
+      nnAnimationFrameId = requestAnimationFrame(animateNN);
+    }
+
+    // Activate signals on connections with cascading delay
+    outConns.forEach((c, i) => {
+      setTimeout(() => {
+        c.signal = 0.8;  // Signal brightness
+        c.progress = 0;   // Reset animation progress
+
+        const target = nnMode === 'forward' ? c.to : c.from;
+
+        // When dot reaches target, light up that node and cascade to next layer
+        setTimeout(() => {
+          target.active = 1;
+
+          // Flash weight label in backward mode
+          if (nnMode === 'backward') {
+            c.flashWeight = 1;
+          }
+
+          // Pulse animation for output nodes in backward mode
+          if (nnMode === 'backward' && target.layer === 3) {
+            target.pulseAnim = 1;
+          }
+
+          activateNode(target);
+        }, 400);  // Match SEGMENT_DURATION
+      }, i * 80);
+    });
+  }
+
+  // Update status text
+  updateNNStatus();
+}
+
+function updateNNStatus() {
+  const statusEl = document.getElementById('nnStatus');
+  if (!statusEl) return;
+
+  if (nnMode === 'forward') {
+    statusEl.textContent = '⚡ Sinyal giriş katmanından çıkış katmanına ilerliyor...';
+    statusEl.style.color = '#22495A';
+  } else {
+    statusEl.textContent = '🔴 Hata çıkıştan geriye yayılıyor — ağırlıklar güncelleniyor...';
+    statusEl.style.color = '#ef4444';
+  }
+}
+
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX, my = (e.clientY - rect.top) * scaleY;
+  const clicked = nnNodes.find(n => Math.hypot(n.x - mx, n.y - my) < n.r * 1.5);
+
+  if (clicked) {
+    // In backward mode, only allow clicking output nodes (layer 3)
+    if (nnMode === 'backward' && clicked.layer !== 3) {
+      return;
+    }
+    resetNN();
+    activateNode(clicked);
+  }
+});
+
+function setNNMode(mode, btn) {
+  nnMode = mode;
+  document.querySelectorAll('.nn-controls .chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetNN();
+  updateNNStatus();
+}
+
+function resetNN() {
+  // Cancel animation frame if running
+  if (nnAnimationFrameId !== null) {
+    cancelAnimationFrame(nnAnimationFrameId);
+    nnAnimationFrameId = null;
+  }
+  nnStartTime = 0;
+
+  nnNodes.forEach(n => {
+    n.active = 0;
+    n.pulseAnim = 0;
+  });
+
+  nnConns.forEach(c => {
+    c.signal = 0;
+    c.progress = 0;
+    c.flashWeight = 0;
+  });
+
+  // Clear status text
+  const statusEl = document.getElementById('nnStatus');
+  if (statusEl) statusEl.textContent = '';
+
+  drawNN();
+}
+
+initNN();
+
+// ===== TIMELINE =====
+const timelineData = [
+  { year: 'MÖ ~350', title: 'Aristo — Mantık', desc: 'Formel mantık kurallarını sistemleştirdi', color: 'var(--purple-500)' },
+  { year: '1600-1800', title: 'Leibniz, Babbage, Lovelace', desc: 'Mekanik hesaplama ve ilk programlama', color: 'var(--teal)' },
+  { year: '1950', title: 'Alan Turing — Turing Testi', desc: '"Makineler düşünebilir mi?" sorusu', color: 'var(--teal)' },
+  { year: '1956', title: 'Dartmouth Konferansı', desc: '"Yapay zeka" teriminin doğuşu', color: 'var(--purple-500)' },
+  { year: '1966', title: 'ELIZA', desc: 'İlk sohbet botu', color: 'var(--teal)' },
+  { year: '1970-1990', title: 'Yapay Zeka Kışı', desc: 'Fonlama kesintisi ve durgunluk', color: 'var(--blue-500)' },
+  { year: '1986', title: 'Geri Yayılım', desc: 'Sinir ağlarının öğrenme devrimi', color: 'var(--teal)' },
+  { year: '1997', title: 'Deep Blue vs Kasparov', desc: 'Makine, dünya şampiyonunu yendi', color: 'var(--red-500)' },
+  { year: '2012', title: 'ImageNet Devrimi', desc: 'Derin öğrenme çağının başlangıcı', color: 'var(--green-500)' },
+  { year: '2016', title: 'AlphaGo', desc: "Go'da dünya şampiyonunu yendi", color: 'var(--purple-500)' },
+  { year: '2017', title: 'Transformer', desc: 'Modern YZ mimarisinin temeli', color: 'var(--orange-500)' },
+  { year: '2022+', title: 'ChatGPT ve Üretken YZ', desc: 'Yapay zeka herkesin hayatına girdi', color: 'var(--yellow-500)' }
+];
+
+(function buildTimeline() {
+  const container = document.getElementById('timelineContainer');
+  if (!container) return;
+  timelineData.forEach(item => {
+    container.innerHTML += '<div class="tl-item"><div class="tl-dot" style="border-color:' + item.color + '"></div><div class="tl-content"><div class="tl-year" style="color:' + item.color + '">' + item.year + '</div><h4>' + item.title + '</h4><p>' + item.desc + '</p></div></div>';
+  });
+})();
+
+// ===== TURING TEST SIMULATOR =====
+const turingConvos = [
+  {
+    question: "En sevdiğin mevsim hangisi?",
+    human: "Sonbahar çok güzel, yaprakların renk değiştirmesi beni hep mutlu eder. Geçen yıl Belgrad Ormanı'nda yürüyüş yapmıştık, muhteşemdi.",
+    ai: "Sonbahar mevsimini tercih ediyorum. Yaprakların renk değiştirmesi estetik açıdan etkileyici bir doğa olayıdır. Sıcaklık ortalamaları da konforlu seviyededir."
+  },
+  {
+    question: "Yemek yapmayı sever misin?",
+    human: "Valla açıkçası çok becerikli sayılmam ama makarna yaparım en azından 😄 Geçen hafta kek yapmaya çalıştım, fırını açık unutmuşum, taş gibi oldu.",
+    ai: "Evet, yemek yapmak keyifli bir aktivite. Farklı mutfakların tariflerini denemeyi severim. İtalyan ve Japon mutfağı özellikle ilgimi çekiyor."
+  },
+  {
+    question: "Yapay zeka hakkında ne düşünüyorsun?",
+    human: "Biraz korkutucu ama bir yandan da çok heyecan verici. ChatGPT ile ödevime yardım ettirdim geçen, bayağı işe yaradı. Ama bazen saçmalıyor.",
+    ai: "Yapay zeka, insanlığın en önemli teknolojik gelişmelerinden biridir. Doğal dil işleme, bilgisayarlı görü ve otonom sistemler gibi alanlarda önemli ilerlemeler kaydedilmektedir."
+  },
+  {
+    question: "Hafta sonu ne yaptın?",
+    human: "Arkadaşlarla buluştuk, sahilde yürüdük. Sonra eve gelip Netflix açtım ama 10 dakikada uyumuşum 😴 Pazar sabahı da geç kalktım tabii.",
+    ai: "Hafta sonumu verimli geçirdim. Sabah erken kalktım, egzersiz yaptım ve ardından kitap okudum. Öğleden sonra çeşitli konularda araştırma yaptım."
+  },
+  {
+    question: "En son ne zaman çok güldün?",
+    human: "Dün akşam kedi videolarına bakıyordum, birisi masadan düşerken öyle bir ifade yapıyordu ki gülmekten karnım ağrıdı resmen 🤣",
+    ai: "Mizah, insan deneyiminin önemli bir parçasıdır. Son olarak komik bir durumla karşılaştığımda güldüm. Mizah anlayışı kişiden kişiye farklılık gösterir."
+  }
+];
+
+let turingScore = 0, turingTotal = 0, currentTuring = null;
+
+function newTuringRound() {
+  const idx = Math.floor(Math.random() * turingConvos.length);
+  currentTuring = turingConvos[idx];
+  const aiIsA = Math.random() < 0.5;
+  currentTuring._aiSide = aiIsA ? 'A' : 'B';
+
+  const msgsA = document.getElementById('turingMsgsA');
+  const msgsB = document.getElementById('turingMsgsB');
+  msgsA.innerHTML = '<div class="sim-q">S: ' + currentTuring.question + '</div><div class="sim-a">' + (aiIsA ? currentTuring.ai : currentTuring.human) + '</div>';
+  msgsB.innerHTML = '<div class="sim-q">S: ' + currentTuring.question + '</div><div class="sim-a">' + (aiIsA ? currentTuring.human : currentTuring.ai) + '</div>';
+  document.getElementById('turingResult').textContent = '';
+  document.getElementById('turingQ').textContent = 'Hangisi yapay zeka?';
+  document.getElementById('turingBoxA').style.borderColor = '';
+  document.getElementById('turingBoxB').style.borderColor = '';
+}
+
+function guessTuring(side) {
+  if (!currentTuring) return;
+  turingTotal++;
+  const correct = side === currentTuring._aiSide;
+  if (correct) turingScore++;
+  const resultEl = document.getElementById('turingResult');
+  resultEl.textContent = correct ? '✅ Doğru! ' + currentTuring._aiSide + ' yapay zekaydı.' : '❌ Yanlış! ' + currentTuring._aiSide + ' yapay zekaydı.';
+  resultEl.style.color = correct ? 'var(--green-500)' : 'var(--red-500)';
+  document.getElementById('turingScore').textContent = turingScore;
+  document.getElementById('turingTotal').textContent = turingTotal;
+  document.getElementById('turingBox' + currentTuring._aiSide).style.borderColor = 'var(--red-500)';
+  const humanSide = currentTuring._aiSide === 'A' ? 'B' : 'A';
+  document.getElementById('turingBox' + humanSide).style.borderColor = 'var(--green-500)';
+  currentTuring = null;
+}
+
+newTuringRound();
+
+// ===== FLASHCARDS =====
+const flashcards = [
+  { q: "Yapay zeka terimi ilk kez ne zaman ve nerede kullanıldı?", a: "1956 yılında Dartmouth Konferansı'nda John McCarthy tarafından kullanıldı." },
+  { q: "Turing Testi nedir?", a: "Bir bilgisayarın insan gibi düşünüp düşünemediğini test eden bir yöntemdir. Değerlendirici, makine ile insanı ayırt edemezse test geçilmiş olur." },
+  { q: "ELIZA nedir ve kim geliştirdi?", a: "1966'da Joseph Weizenbaum tarafından MIT'de geliştirilen tarihin ilk sohbet botu." },
+  { q: "Geri yayılım (backpropagation) ne işe yarar?", a: "Sinir ağının hatasını geriye doğru katmanlara yayarak ağırlıkları güncelleyen ve öğrenmeyi sağlayan bir algoritmadır." },
+  { q: "Deep Blue nedir?", a: "IBM'in geliştirdiği süper bilgisayar. 1997'de dünya satranç şampiyonu Garry Kasparov'u yendi." },
+  { q: "AlphaGo neden önemliydi?", a: "Go oyununda kaba kuvvet hesaplama yeterli değildi. AlphaGo sezgisel kararlar vermeyi öğrenerek 2016'da dünya şampiyonunu 4-1 yendi." },
+  { q: "GPT ne anlama gelir?", a: "Generative Pre-trained Transformer — Üretken Önceden Eğitilmiş Dönüştürücü." },
+  { q: "Çin Odası Deneyi'nin argümanı nedir?", a: "John Searle'e göre, doğru cevap vermek gerçek 'anlama' anlamına gelmeyebilir." },
+  { q: "Ada Lovelace neden önemlidir?", a: "Babbage'in Analitik Motoru için ilk algoritmayı yazarak tarihin ilk bilgisayar programcısı oldu." },
+  { q: "Yapay Zeka Kışı nedir?", a: "1970-1990'larda YZ araştırmalarında hayal kırıklığı, fonlama kesintisi ve ilgi kaybının yaşandığı dönem." },
+  { q: "Transformer mimarisi ne zaman tanıtıldı?", a: "2017'de Google'ın 'Attention Is All You Need' makalesiyle tanıtıldı." },
+  { q: "ChatGPT ne zaman çıktı?", a: "2022'de çıktı ve 5 günde 1 milyon kullanıcıya ulaşarak tarihin en hızlı büyüyen uygulaması oldu." }
+];
+
+let flashIdx = 0;
+
+function renderFlashcard() {
+  const fc = flashcards[flashIdx];
+  document.getElementById('flashFront').textContent = fc.q;
+  document.getElementById('flashBack').textContent = fc.a;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('flashProgress').textContent = (flashIdx + 1) + ' / ' + flashcards.length;
+}
+
+function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
+function nextFlashcard() { flashIdx = (flashIdx + 1) % flashcards.length; renderFlashcard(); }
+function prevFlashcard() { flashIdx = (flashIdx - 1 + flashcards.length) % flashcards.length; renderFlashcard(); }
+renderFlashcard();
+
+// ===== SORT GAME =====
+const sortEvents = [
+  { id: 1, text: "Aristo — Mantık kuralları", year: -350 },
+  { id: 2, text: "Leibniz — İkili sayı sistemi", year: 1700 },
+  { id: 3, text: "Ada Lovelace — İlk algoritma", year: 1843 },
+  { id: 4, text: "Alan Turing — Turing Testi", year: 1950 },
+  { id: 5, text: "Dartmouth Konferansı", year: 1956 },
+  { id: 6, text: "ELIZA — İlk sohbet botu", year: 1966 },
+  { id: 7, text: "Geri Yayılım algoritması", year: 1986 },
+  { id: 8, text: "Deep Blue vs Kasparov", year: 1997 },
+  { id: 9, text: "AlphaGo vs Lee Sedol", year: 2016 },
+  { id: 10, text: "ChatGPT yayınlandı", year: 2022 }
+];
+
+let sortOrder = [];
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function renderSortItems() {
+  const container = document.getElementById('sortItems');
+  if (!container) return;
+  container.innerHTML = '';
+  sortOrder.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'sort-item';
+    el.draggable = true;
+    el.dataset.idx = idx;
+    el.innerHTML = '<span class="sort-handle">⠿</span><span class="sort-text">' + item.text + '</span>';
+    el.addEventListener('dragstart', onDragStart);
+    el.addEventListener('dragover', onDragOver);
+    el.addEventListener('drop', onDrop);
+    el.addEventListener('dragend', onDragEnd);
+    // Touch support
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    container.appendChild(el);
+  });
+  document.getElementById('sortResult').textContent = '';
+}
+
+let dragIdx = null;
+function onDragStart(e) { dragIdx = +e.currentTarget.dataset.idx; e.currentTarget.style.opacity = '.5'; }
+function onDragOver(e) { e.preventDefault(); }
+function onDrop(e) {
+  e.preventDefault();
+  const dropIdx = +e.currentTarget.dataset.idx;
+  if (dragIdx !== null && dragIdx !== dropIdx) {
+    const temp = sortOrder[dragIdx];
+    sortOrder.splice(dragIdx, 1);
+    sortOrder.splice(dropIdx, 0, temp);
+    renderSortItems();
+  }
+}
+function onDragEnd(e) { e.currentTarget.style.opacity = '1'; dragIdx = null; }
+
+// Touch drag
+let touchDragEl = null, touchStartY = 0, touchIdx = null;
+function onTouchStart(e) {
+  touchIdx = +e.currentTarget.dataset.idx;
+  touchStartY = e.touches[0].clientY;
+  touchDragEl = e.currentTarget;
+  touchDragEl.style.background = '#f0f9ff';
+}
+function onTouchMove(e) {
+  e.preventDefault();
+  const y = e.touches[0].clientY;
+  const diff = y - touchStartY;
+  if (touchDragEl) touchDragEl.style.transform = 'translateY(' + diff + 'px)';
+}
+function onTouchEnd(e) {
+  if (!touchDragEl) return;
+  const endY = e.changedTouches[0].clientY;
+  const items = document.querySelectorAll('.sort-item');
+  let targetIdx = touchIdx;
+  items.forEach((item, i) => {
+    const rect = item.getBoundingClientRect();
+    if (endY > rect.top && endY < rect.bottom && i !== touchIdx) targetIdx = i;
+  });
+  if (targetIdx !== touchIdx) {
+    const temp = sortOrder[touchIdx];
+    sortOrder.splice(touchIdx, 1);
+    sortOrder.splice(targetIdx, 0, temp);
+  }
+  touchDragEl.style.transform = '';
+  touchDragEl.style.background = '';
+  touchDragEl = null;
+  renderSortItems();
+}
+
+function checkSortOrder() {
+  const items = document.querySelectorAll('.sort-item');
+  let allCorrect = true;
+  const correctOrder = [...sortEvents].sort((a, b) => a.year - b.year);
+  items.forEach((el, i) => {
+    if (sortOrder[i].id === correctOrder[i].id) {
+      el.classList.add('correct'); el.classList.remove('wrong');
+    } else {
+      el.classList.add('wrong'); el.classList.remove('correct');
+      allCorrect = false;
+    }
+  });
+  document.getElementById('sortResult').textContent = allCorrect ? '🎉 Mükemmel! Tüm olayları doğru sıraladınız!' : '❌ Bazı olaylar yanlış sırada. Tekrar deneyin!';
+  document.getElementById('sortResult').style.color = allCorrect ? 'var(--green-500)' : 'var(--red-500)';
+}
+
+function resetSortGame() { sortOrder = shuffleArray(sortEvents); renderSortItems(); }
+resetSortGame();
+
+// ===== WORD CLOUD (removed – replaced by AI vs Human game) =====
+
+// ===== QUIZ =====
+const quizData = [
+  { q: "Yapay zeka terimi ilk kez hangi etkinlikte kullanıldı?", opts: ["Turing Konferansı (1950)", "Dartmouth Konferansı (1956)", "MIT Çalıştayı (1960)", "Stanford Sempozyumu (1965)"], correct: 1, explain: "\"Yapay zeka\" terimi ilk kez 1956 Dartmouth Konferansı'nda John McCarthy tarafından kullanıldı." },
+  { q: "Turing Testi neyi ölçer?", opts: ["Bilgisayarın hızını", "Bilgisayarın insan gibi düşünüp düşünemediğini", "Programlama dilinin kalitesini", "İnternet bağlantı hızını"], correct: 1, explain: "Turing Testi, bir bilgisayarın insan gibi düşünüp düşünemediğini ölçer." },
+  { q: "ELIZA nedir?", opts: ["Bir uzman sistem", "İlk sohbet botu", "Bir işletim sistemi", "Bir programlama dili"], correct: 1, explain: "ELIZA (1966), Joseph Weizenbaum tarafından MIT'de geliştirilen tarihin ilk sohbet botudur." },
+  { q: "Deep Blue hangi oyunda dünya şampiyonunu yendi?", opts: ["Go", "Dama", "Satranç", "Poker"], correct: 2, explain: "IBM'in Deep Blue'su 1997'de dünya satranç şampiyonu Garry Kasparov'u yendi." },
+  { q: "'Yapay Zeka Kışı' ne anlama gelir?", opts: ["YZ'nin soğuk bölgelerde çalışması", "YZ araştırmalarında durgunluk ve fonlama kesintisi", "Kış temalı YZ projeleri", "YZ'nin kış sporlarında kullanılması"], correct: 1, explain: "YZ Kışı, yapay zeka araştırmalarında fonlama kesintisi ve ilgi kaybının yaşandığı dönemlerdir." },
+  { q: "AlphaGo hangi oyunda dünya şampiyonunu yendi?", opts: ["Satranç", "Go", "Dama", "Scrabble"], correct: 1, explain: "Google DeepMind'ın AlphaGo'su 2016'da dünya Go şampiyonu Lee Sedol'u 4-1 yendi." },
+  { q: "Geri yayılım ne işe yarar?", opts: ["İnternette veri aktarımı", "Sinir ağlarının hatalarından öğrenmesi", "Verilerin yedeklenmesi", "Dosyaların sıkıştırılması"], correct: 1, explain: "Geri yayılım, sinir ağının hatasını geriye doğru yayarak öğrenmeyi sağlar." },
+  { q: "GPT'deki 'G' harfi ne anlama gelir?", opts: ["General", "Generative", "Global", "Graphic"], correct: 1, explain: "GPT = Generative Pre-trained Transformer. 'G' = Üretken." },
+  { q: "Çin Odası Deneyi'nin temel argümanı nedir?", opts: ["Bilgisayarlar Çince öğrenebilir", "Doğru cevap vermek, anlamak anlamına gelmeyebilir", "Çince en zor dildir", "Bilgisayarlar insanlardan daha zekidir"], correct: 1, explain: "Searle'e göre doğru çıktılar üretmek gerçek 'anlama' anlamına gelmeyebilir." },
+  { q: "Ada Lovelace neden önemlidir?", opts: ["İlk bilgisayarı icat etti", "Tarihin ilk bilgisayar programcısıdır", "İnterneti geliştirdi", "YZ terimini ortaya attı"], correct: 1, explain: "Ada Lovelace, Babbage'in Analitik Motoru için ilk algoritmayı yazarak tarihin ilk programcısı oldu." }
+];
+
+let quizIdx = 0, quizScore = 0;
+
+function startQuiz() {
+  quizIdx = 0; quizScore = 0;
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizData[quizIdx];
+  let prog = '';
+  for (let i = 0; i < quizData.length; i++) { prog += '<div class="dot ' + (i < quizIdx ? 'done' : i === quizIdx ? 'current' : '') + '"></div>'; }
+  document.getElementById('quizProgress').innerHTML = prog;
+  document.getElementById('quizQuestion').textContent = (quizIdx + 1) + '/' + quizData.length + ' — ' + q.q;
+  let opts = '';
+  q.opts.forEach((o, i) => { opts += '<button class="quiz-opt" onclick="checkAnswer(' + i + ')">' + o + '</button>'; });
+  document.getElementById('quizOpts').innerHTML = opts;
+  document.getElementById('quizFeedback').classList.remove('show');
+  document.getElementById('quizNext').style.display = 'none';
+}
+
+function checkAnswer(idx) {
+  const q = quizData[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((o, i) => {
+    o.classList.add('disabled');
+    if (i === q.correct) o.classList.add('correct');
+    if (i === idx && i !== q.correct) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('quizFeedback');
+  if (idx === q.correct) {
+    quizScore++;
+    fb.textContent = '✅ Doğru! ' + q.explain;
+    fb.style.background = '#f0fdf4'; fb.style.color = 'var(--green-500)';
+  } else {
+    fb.textContent = '❌ Yanlış. ' + q.explain;
+    fb.style.background = '#fef2f2'; fb.style.color = 'var(--red-500)';
+  }
+  fb.classList.add('show');
+  const nextBtn = document.getElementById('quizNext');
+  nextBtn.style.display = 'inline-block';
+  nextBtn.textContent = quizIdx < quizData.length - 1 ? 'Sonraki Soru →' : 'Sonuçları Gör';
+}
+
+function nextQuestion() {
+  quizIdx++;
+  if (quizIdx >= quizData.length) {
+    document.getElementById('quizArea').style.display = 'none';
+    const r = document.getElementById('quizResult'); r.style.display = 'block';
+    const pct = Math.round(quizScore / quizData.length * 100);
+    document.getElementById('quizScoreDisplay').textContent = quizScore + '/' + quizData.length;
+    document.getElementById('quizScoreDisplay').style.color = pct >= 70 ? 'var(--green-500)' : pct >= 40 ? 'var(--orange-500)' : 'var(--red-500)';
+    const msgs = pct >= 90 ? 'Mükemmel! Yapay zeka tarihçesine hakimsiniz! 🎉' : pct >= 70 ? 'Harika! Çok iyi bir sonuç! 👏' : pct >= 50 ? 'İyi! Biraz daha çalışarak daha iyi olabilirsiniz. 📚' : 'Konuyu tekrar gözden geçirmenizi öneririm. 💪';
+    document.getElementById('quizScoreText').textContent = msgs;
+    return;
+  }
+  renderQuestion();
+}
+
+startQuiz();
+
+// ===== XP SYSTEM =====
+let totalXP = 0;
+function addXP(amount) {
+  totalXP += amount;
+  const el = document.getElementById('navXP');
+  if (el) el.textContent = totalXP;
+  // Toast
+  const toast = document.createElement('div');
+  toast.className = 'xp-toast';
+  toast.textContent = '+' + amount + ' XP';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2200);
+}
+
+// ===== AI vs HUMAN GAME =====
+const aiHumanTexts = [
+  { text: "Yağmur yağdığında camın kenarında oturup çay içmek, sanki zamanın durduğu ve dünyanın sadece o andan ibaret olduğu bir hisse kapılmak... İşte hayatta en çok sevdiğim an bu.", author: "human", source: "Bir öğrenci blog yazısından" },
+  { text: "Sonbahar yaprakları yere düştüğünde, doğanın döngüsel güzelliğini gözlemlemek için mükemmel bir fırsat sunulur. Bu mevsimsel geçiş, hem estetik hem de ekolojik açıdan dikkate değer bir süreçtir.", author: "ai", source: "GPT-4 tarafından üretildi" },
+  { text: "Bugün markettte sıra beklerken önümdeki teyze 15 dakika kasiyerle muhabbet etti. Normalde sinirlenirdim ama kadın o kadar tatlıydı ki ben de gülümsedim. Bazen yavaşlamak gerekiyomuş.", author: "human", source: "Twitter paylaşımından" },
+  { text: "Müzik, insan deneyiminin en evrensel ifade biçimlerinden biridir. Farklı kültürler ve dönemler boyunca, melodik yapılar ve ritmik örüntüler aracılığıyla duygular iletilmiştir.", author: "ai", source: "Claude tarafından üretildi" },
+  { text: "Sabah 5'te uyanıp koşuya çıktım, güneş henüz doğmamıştı. Kulaklığımdan Radiohead çalıyordu ve bir anda kendimi çocukluğumda, dedemin bahçesinde hissettim. Müzik garip şeyler yapıyor insana.", author: "human", source: "Kişisel günlükten" },
+  { text: "Yapay zeka teknolojilerinin gelişimi, toplumsal yapıları köklü biçimde dönüştürme potansiyeli taşımaktadır. İş gücü piyasası, eğitim sistemleri ve sağlık hizmetleri bu dönüşümden en çok etkilenecek alanlar arasında yer almaktadır.", author: "ai", source: "GPT-4 tarafından üretildi" },
+  { text: "Kedim bugün dolabın üstüne çıkıp vazoyu düşürdü. Sonra suçsuzmuş gibi yüzüme baktı. Ben de ona baktım. 3 saniye göz göze geldik. Sonra kalktı gitti. Sanırım tartışmayı o kazandı.", author: "human", source: "Reddit yorumundan" },
+  { text: "Akdeniz mutfağı, zeytinyağı, taze sebzeler ve baharatların harmonik birleşimini esas alan bir gastronomi geleneğidir. Beslenme bilimi araştırmaları, bu diyetin kardiyovasküler sağlık üzerinde olumlu etkileri olduğunu göstermektedir.", author: "ai", source: "Claude tarafından üretildi" }
+];
+
+let ahScore = 0, ahTotal = 0, currentAH = null;
+
+function newAIHumanRound() {
+  const idx = Math.floor(Math.random() * aiHumanTexts.length);
+  currentAH = aiHumanTexts[idx];
+  document.getElementById('aiHumanText').textContent = '"' + currentAH.text + '"';
+  document.getElementById('aiHumanResult').textContent = '';
+}
+
+function guessAIHuman(guess) {
+  if (!currentAH) return;
+  ahTotal++;
+  const correct = guess === currentAH.author;
+  if (correct) { ahScore++; addXP(15); }
+  const res = document.getElementById('aiHumanResult');
+  const label = currentAH.author === 'ai' ? '🤖 Yapay Zeka' : '✍️ İnsan';
+  res.textContent = correct ? '✅ Doğru! Bu metin ' + label + ' tarafından yazıldı. (' + currentAH.source + ')' : '❌ Yanlış! Bu metin ' + label + ' tarafından yazıldı. (' + currentAH.source + ')';
+  res.style.color = correct ? 'var(--green-500)' : 'var(--red-500)';
+  document.getElementById('ahScore').textContent = ahScore;
+  document.getElementById('ahTotal').textContent = ahTotal;
+  currentAH = null;
+}
+
+newAIHumanRound();
+
+// ===== DAILY AI =====
+const dailyAIItems = [
+  { name: "Spotify önerileri", icon: "🎵", hasAI: true },
+  { name: "Buzdolabı", icon: "🧊", hasAI: false },
+  { name: "Google Haritalar", icon: "🗺️", hasAI: true },
+  { name: "Normal hesap makinesi", icon: "🔢", hasAI: false },
+  { name: "Netflix 'Sizin İçin'", icon: "🎬", hasAI: true },
+  { name: "TikTok akışı", icon: "📱", hasAI: true },
+  { name: "Duvar saati", icon: "🕐", hasAI: false },
+  { name: "Yüz tanıma kilidi", icon: "🔓", hasAI: true },
+  { name: "E-posta spam filtresi", icon: "📧", hasAI: true },
+  { name: "Klasik fotoğraf makinesi", icon: "📷", hasAI: false },
+  { name: "Sesli asistan (Siri)", icon: "🗣️", hasAI: true },
+  { name: "Otopark bariyeri", icon: "🅿️", hasAI: false }
+];
+
+(function buildDailyAI() {
+  const grid = document.getElementById('dailyAIGrid');
+  if (!grid) return;
+  dailyAIItems.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'daily-ai-item';
+    el.dataset.idx = i;
+    el.innerHTML = '<span class="dai-icon">' + item.icon + '</span><span class="dai-text">' + item.name + '</span>';
+    el.addEventListener('click', function() { this.classList.toggle('selected'); });
+    grid.appendChild(el);
+  });
+})();
+
+function checkDailyAI() {
+  let correct = 0;
+  const items = document.querySelectorAll('.daily-ai-item');
+  items.forEach((el, i) => {
+    const isSelected = el.classList.contains('selected');
+    const hasAI = dailyAIItems[i].hasAI;
+    el.classList.remove('correct', 'wrong');
+    if (isSelected === hasAI) { el.classList.add('correct'); correct++; }
+    else { el.classList.add('wrong'); }
+  });
+  const total = dailyAIItems.length;
+  const pct = Math.round(correct / total * 100);
+  document.getElementById('dailyAIResult').textContent = correct + '/' + total + ' doğru (' + pct + '%)' + (pct === 100 ? ' 🎉 Mükemmel!' : pct >= 75 ? ' 👏 Harika!' : ' 🤔 Tekrar deneyin!');
+  document.getElementById('dailyAIResult').style.color = pct >= 75 ? 'var(--green-500)' : 'var(--orange-500)';
+  if (pct >= 75) addXP(20);
+}
+
+// ===== ETHICS SCENARIOS =====
+const ethicsScenarios = [
+  {
+    scenario: "🚗 Otonom bir araç, aniden yola çıkan 3 yayaya çarpmamak için keskin bir dönüş yapmalı. Ama dönerse araçtaki 1 yolcu tehlikeye girer. YZ ne yapmalı?",
+    options: ["Yayaları korumak için dön (1 yolcu risk altında)", "Yolcuyu korumak için düz git (3 yaya risk altında)", "Acil fren yap (herkes risk altında ama daha az)"],
+    explain: "Bu, 'Trolley Problem'in modern versiyonudur. Henüz net bir etik cevabı yoktur. Çoğu ülke bu konuda yasal düzenleme yapmaya çalışıyor. Almanya, 'sayısal karşılaştırma yapılamaz' kuralını benimsedi."
+  },
+  {
+    scenario: "👨‍⚕️ Bir YZ sistemi, hastanedeki röntgen görüntülerini %95 doğrulukla analiz edebiliyor (uzman doktorların oranı %92). Hastane, doktorları tamamen çıkarıp sadece YZ'yi mi kullanmalı?",
+    options: ["Evet, YZ daha doğru — doktorlara gerek yok", "Hayır, YZ sadece doktora yardımcı olmalı", "YZ karar versin, doktor sadece kontrol etsin"],
+    explain: "Çoğu uzman 'insan döngüde' (human-in-the-loop) yaklaşımını savunuyor. YZ %95 doğru olsa bile, %5 hata oranı hayati olabilir. Ayrıca YZ, nadir hastalıkları kaçırabilir çünkü eğitim verisinde az temsil edilirler."
+  },
+  {
+    scenario: "🎓 Bir öğrenci, YZ kullanarak ödev yazıyor ve A+ alıyor. Öğretmen bunu keşfediyor. Ne yapılmalı?",
+    options: ["Öğrenci cezalandırılmalı — bu kopya çekmektir", "Normal — hesap makinesi gibi bir araçtır", "YZ kullanımı şeffaf olmalı — kaynakça gibi belirtilmeli"],
+    explain: "Bu tartışma eğitimde devam ediyor. Pek çok uzman, YZ'yi yasaklamak yerine 'sorumlu kullanım' politikalarını savunuyor. Kritik düşünme ve YZ okuryazarlığı öne çıkıyor."
+  },
+  {
+    scenario: "🏢 Bir şirket, işe alımda YZ kullanıyor. Ama YZ sistemi, kadın adayları erkek adaylardan daha düşük puanlıyor. Sorun ne?",
+    options: ["YZ cinsiyetçi — hemen kapatılmalı", "Eğitim verisi önyargılı — veri düzeltilmeli", "YZ değil, geçmişteki insan kararları sorunlu"],
+    explain: "Amazon'un gerçek bir vakası! 2018'de keşfedildi. Sorun: YZ, geçmiş işe alım verilerinden öğrenmişti. Geçmişte erkekler daha çok işe alındığı için, YZ de bunu 'doğru' sanmıştı. Bu 'algoritmik önyargı' (algorithmic bias) sorunudur."
+  },
+  {
+    scenario: "🎨 Bir sanatçı, yıllarca üzerinde çalıştığı tarzı YZ tarafından kopyalanıp saniyeler içinde üretiliyor. Sanatçı dava açıyor. Kim haklı?",
+    options: ["Sanatçı haklı — stili çalınmış", "YZ şirketi haklı — stil telif hakkı kapsamında değil", "Yeni yasalar gerekiyor — mevcut hukuk yetersiz"],
+    explain: "Bu tartışma dünya çapında mahkemelerde devam ediyor. AB'nin AI Act'i, eğitim verisinin şeffaf olmasını zorunlu kılıyor. Birçok sanatçı, 'opt-out' (dışında kalma) hakkı talep ediyor."
+  }
+];
+
+let ethicsIdx = 0;
+
+function renderEthics() {
+  const s = ethicsScenarios[ethicsIdx];
+  const scenarioEl = document.getElementById('ethicsScenario');
+  const optsEl = document.getElementById('ethicsOptions');
+  if (!scenarioEl || !optsEl) return;
+  scenarioEl.innerHTML = '<p style="font-size:1rem;line-height:1.7">' + s.scenario + '</p>';
+  optsEl.innerHTML = '';
+  s.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ethics-opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.ethics-opt').forEach(b => b.classList.remove('chosen'));
+      this.classList.add('chosen');
+      const exp = document.getElementById('ethicsExplain');
+      exp.style.display = 'block';
+      exp.innerHTML = '<strong>📌 Perspektif:</strong><p class="small" style="margin-top:.25rem">' + s.explain + '</p>';
+      addXP(10);
+    });
+    optsEl.appendChild(btn);
+  });
+  document.getElementById('ethicsExplain').style.display = 'none';
+  document.getElementById('ethicsNum').textContent = (ethicsIdx + 1);
+}
+
+function nextEthics() {
+  ethicsIdx = (ethicsIdx + 1) % ethicsScenarios.length;
+  renderEthics();
+}
+
+renderEthics();
+
+// ===== XP from existing interactions =====
+// Award XP for quiz answers
+const origCheckAnswer = checkAnswer;
+checkAnswer = function(idx) {
+  origCheckAnswer(idx);
+  const q = quizData[quizIdx];
+  if (idx === q.correct) addXP(10);
+};
+
+// Award XP for Turing guess
+const origGuessTuring = guessTuring;
+guessTuring = function(side) {
+  const before = turingScore;
+  origGuessTuring(side);
+  if (turingScore > before) addXP(15);
+};
+
+// ===== PERCEPTRON PLAYGROUND =====
+let perceptronData = { and: [], or: [], xor: [] };
+let perceptronCurrentMode = 'and';
+let perceptronLine = null;
+
+function initPerceptronData() {
+  perceptronData.and = [
+    { x: 50, y: 50, label: 0 }, { x: 50, y: 300, label: 0 },
+    { x: 300, y: 50, label: 0 }, { x: 300, y: 300, label: 1 }
+  ];
+  perceptronData.or = [
+    { x: 50, y: 50, label: 0 }, { x: 50, y: 300, label: 1 },
+    { x: 300, y: 50, label: 1 }, { x: 300, y: 300, label: 1 }
+  ];
+  perceptronData.xor = [
+    { x: 50, y: 50, label: 0 }, { x: 50, y: 300, label: 1 },
+    { x: 300, y: 50, label: 1 }, { x: 300, y: 300, label: 0 }
+  ];
+}
+
+function drawPerceptronPlayground(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const padding = 40, gridSize = (w - padding * 2) / 3;
+  const data = perceptronData[perceptronCurrentMode];
+
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padding, padding); ctx.lineTo(padding, h - padding); ctx.lineTo(w - padding, h - padding); ctx.stroke();
+
+  // Draw grid
+  for (let i = 1; i < 4; i++) {
+    const x = padding + gridSize * i;
+    ctx.beginPath(); ctx.moveTo(x, padding); ctx.lineTo(x, h - padding);
+    ctx.strokeStyle = '#f3f4f6'; ctx.lineWidth = 1; ctx.stroke();
+    const y = padding + gridSize * i;
+    ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(w - padding, y); ctx.stroke();
+  }
+
+  // Draw data points
+  data.forEach(pt => {
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = pt.label === 1 ? '#22c55e' : '#ef4444'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  });
+
+  // Draw dividing line if exists
+  if (perceptronLine) {
+    const { x1, y1, x2, y2 } = perceptronLine;
+    ctx.strokeStyle = '#22495A'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // Calculate accuracy if line exists
+  if (perceptronLine) {
+    let correct = 0;
+    const { x1, y1, x2, y2 } = perceptronLine;
+    const dx = x2 - x1, dy = y2 - y1;
+    const denom = Math.sqrt(dx * dx + dy * dy);
+    if (denom > 0) {
+      data.forEach(pt => {
+        const dist = Math.abs(dy * pt.x - dx * pt.y + x2 * y1 - y2 * x1) / denom;
+        const side = (dy * pt.x - dx * pt.y + x2 * y1 - y2 * x1) > 0 ? 1 : 0;
+        if (side === pt.label) correct++;
+      });
+      const acc = Math.round(correct / data.length * 100);
+      const accEl = canvasId.includes('Alt') ? document.getElementById('perceptronAccuracyAlt') : document.getElementById('perceptronAccuracy');
+      if (accEl) accEl.textContent = acc + '%';
+      if (acc === 100 && perceptronCurrentMode !== 'xor') {
+        const msgEl = canvasId.includes('Alt') ? document.getElementById('perceptronMsgAlt') : document.getElementById('perceptronMsg');
+        if (msgEl) msgEl.textContent = '✅ Mükemmel! Tüm noktaları doğru sınıflandırdınız!';
+      } else if (perceptronCurrentMode === 'xor' && acc < 100) {
+        const msgEl = canvasId.includes('Alt') ? document.getElementById('perceptronMsgAlt') : document.getElementById('perceptronMsg');
+        if (msgEl) msgEl.textContent = 'XOR için tek çizgi yeterli değil! Çok katmanlı ağa ihtiyaç.';
+      }
+    }
+  }
+}
+
+function setupPerceptronCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  drawPerceptronPlayground(canvasId);
+
+  let startX = 0, startY = 0, drawing = false;
+  canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    drawing = true;
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    perceptronLine = { x1: startX, y1: startY, x2: x, y2: y };
+    drawPerceptronPlayground(canvasId);
+  });
+
+  canvas.addEventListener('mouseup', () => { drawing = false; });
+  canvas.addEventListener('mouseleave', () => { drawing = false; });
+}
+
+function setPerceptronDataset(dataset, btn) {
+  perceptronCurrentMode = dataset;
+  const parent = btn.parentElement;
+  if (parent) parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetPerceptronCanvas();
+}
+
+function setPerceptronDatasetAlt(dataset, btn) {
+  perceptronCurrentMode = dataset;
+  const parent = btn.parentElement;
+  if (parent) parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  resetPerceptronCanvasAlt();
+}
+
+function resetPerceptronCanvas() {
+  perceptronLine = null;
+  drawPerceptronPlayground('perceptronCanvas');
+  const accEl = document.getElementById('perceptronAccuracy');
+  const msgEl = document.getElementById('perceptronMsg');
+  if (accEl) accEl.textContent = '-%';
+  if (msgEl) msgEl.textContent = '';
+}
+
+function resetPerceptronCanvasAlt() {
+  perceptronLine = null;
+  drawPerceptronPlayground('perceptronCanvasAlt');
+  const accEl = document.getElementById('perceptronAccuracyAlt');
+  const msgEl = document.getElementById('perceptronMsgAlt');
+  if (accEl) accEl.textContent = '0%';
+  if (msgEl) msgEl.textContent = '';
+}
+
+// Initialize perceptrons when page loads
+setTimeout(() => {
+  initPerceptronData();
+  const pc = document.getElementById('perceptronCanvas');
+  const pc2 = document.getElementById('perceptronCanvasAlt');
+  if (pc) setupPerceptronCanvas('perceptronCanvas');
+  if (pc2) setupPerceptronCanvas('perceptronCanvasAlt');
+}, 100);
+
+// ===== ATTENTION VISUALIZATION =====
+function initAttentionViz() {
+  const sentence = "Çocuk bahçeye gitti çünkü hava güzeldi";
+  const words = sentence.split(' ');
+
+  const attentionScores = {
+    'Çocuk': { 'bahçeye': 0.8, 'gitti': 0.7, 'çünkü': 0.2 },
+    'bahçeye': { 'Çocuk': 0.6, 'gitti': 0.9, 'hava': 0.3 },
+    'gitti': { 'Çocuk': 0.8, 'bahçeye': 0.8, 'çünkü': 0.4 },
+    'çünkü': { 'hava': 0.9, 'güzeldi': 0.8, 'gitti': 0.3 },
+    'hava': { 'güzeldi': 0.95, 'çünkü': 0.7 },
+    'güzeldi': { 'hava': 0.9, 'çünkü': 0.8 }
+  };
+
+  const viz = document.getElementById('attentionViz');
+  if (!viz) return;
+  viz.innerHTML = '';
+
+  words.forEach(word => {
+    const span = document.createElement('span');
+    span.className = 'attention-word';
+    span.textContent = word;
+    span.addEventListener('mouseover', () => {
+      viz.querySelectorAll('.attention-word').forEach(w => w.classList.remove('active'));
+      span.classList.add('active');
+
+      const attn = attentionScores[word] || {};
+      words.forEach(otherWord => {
+        const otherSpan = Array.from(viz.children).find(el => el.textContent === otherWord && el !== span);
+        if (otherSpan) {
+          const score = attn[otherWord] || 0;
+          if (score > 0) {
+            otherSpan.style.opacity = (0.3 + score * 0.7).toString();
+            otherSpan.style.borderColor = 'rgba(249, 115, 22, ' + (0.3 + score * 0.7) + ')';
+          } else {
+            otherSpan.style.opacity = '0.3';
+            otherSpan.style.borderColor = '#d1d5db';
+          }
+        }
+      });
+    });
+    span.addEventListener('mouseout', () => {
+      viz.querySelectorAll('.attention-word').forEach(w => {
+        w.classList.remove('active');
+        w.style.opacity = '1';
+        w.style.borderColor = '';
+      });
+    });
+    viz.appendChild(span);
+  });
+}
+
+setTimeout(initAttentionViz, 100);
+
+// ===== MACHINE LEARNING SCENARIO GAME =====
+const mlScenarios = [
+  { scenario: "📧 E-postalarınızı spam ve spam değil olarak otomatik sınıflandırma", answer: 0, explain: "Denetimli Öğrenme: Spam/değil etiketli verilerden öğrenir." },
+  { scenario: "👥 Müşterileri alışveriş alışkanlıklarına göre otomatik gruplama", answer: 1, explain: "Denetimsiz Öğrenme: Etiket yoktur. Verideki kalıpları kendisi bulur (clustering)." },
+  { scenario: "🤖 Bir robota yürümeyi öğretme — deneme yanılma ve ödülle", answer: 2, explain: "Pekiştirmeli Öğrenme: Robot iyi harekete ödül, kötüye ceza alır." },
+  { scenario: "⚕️ Hastalık teşhisi koymak (röntgen görüntüsünden)", answer: 0, explain: "Denetimli Öğrenme: 'Hastalık var' / 'yok' etiketli görüntülerden öğrenir." },
+  { scenario: "🎬 Netflix'te benzer filmleri otomatik gruplama", answer: 1, explain: "Denetimsiz Öğrenme: Filmleri türlerine ve benzerliklere göre gruplar." },
+  { scenario: "♟️ Satranç oynayan YZ geliştirme", answer: 2, explain: "Pekiştirmeli Öğrenme: Hamleleri deneyerek kazanmayı öğrenir." },
+  { scenario: "☀️ Hava durumu tahmini (geçmiş verilerden)", answer: 0, explain: "Denetimli Öğrenme: Geçmiş hava koşullarından tahmini öğrenir." },
+  { scenario: "🚨 Kredi kartı dolandırıcılığını otomatik tespit etme", answer: 1, explain: "Denetimsiz Öğrenme: Normal işlemlerden sapmaları (anomali) bulur." },
+  { scenario: "🚗 Otonom araç sürüşü geliştirme", answer: 2, explain: "Pekiştirmeli Öğrenme: Güvenli sürüşe ödül, çarpışmaya ceza." },
+  { scenario: "💰 Ev fiyatını tahmin etme (kat sayısı, lokasyon, vb.)", answer: 0, explain: "Denetimli Öğrenme: Geçmiş satış fiyatlarından fiyat tahmini öğrenir." }
+];
+
+let mlIdx = 0, mlScore = 0, mlTotal = 0, mlCurrentAnswer = null;
+
+function renderMLScenario() {
+  const s = mlScenarios[mlIdx];
+  const scenarioEl = document.getElementById('mlScenario');
+  const optsEl = document.getElementById('mlOptions');
+  const resultEl = document.getElementById('mlResult');
+
+  if (!scenarioEl || !optsEl) return;
+
+  scenarioEl.innerHTML = '<p style="font-size:1rem;line-height:1.7">' + s.scenario + '</p>';
+  optsEl.innerHTML = '';
+
+  const optLabels = ['🏷️ Denetimli Öğrenme', '🔍 Denetimsiz Öğrenme', '🎮 Pekiştirmeli Öğrenme'];
+  const optDescs = [
+    'Etiketli veri ile öğrenme (spam/değil, fiyat, hastalık)',
+    'Etiket olmadan kalıp bulma (gruplama, anomali)',
+    'Ödül/ceza ile deneme yanılma (oyunlar, robot)'
+  ];
+
+  optLabels.forEach((lbl, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ml-option';
+    btn.innerHTML = '<strong>' + lbl + '</strong><div class="small text-secondary" style="margin-top:.25rem">' + optDescs[i] + '</div>';
+    btn.addEventListener('click', () => checkMLAnswer(i));
+    optsEl.appendChild(btn);
+  });
+
+  resultEl.style.display = 'none';
+  document.getElementById('mlNum').textContent = (mlIdx + 1);
+  mlCurrentAnswer = null;
+}
+
+function checkMLAnswer(idx) {
+  if (mlCurrentAnswer !== null) return;
+  mlCurrentAnswer = idx;
+  mlTotal++;
+
+  const s = mlScenarios[mlIdx];
+  const correct = idx === s.answer;
+  if (correct) mlScore++;
+
+  const opts = document.querySelectorAll('.ml-option');
+  opts.forEach((o, i) => {
+    if (i === s.answer) o.classList.add('correct');
+    if (i === idx && i !== s.answer) o.classList.add('wrong');
+    o.style.pointerEvents = 'none';
+    o.style.opacity = '0.7';
+  });
+
+  const res = document.getElementById('mlResult');
+  res.style.display = 'block';
+  res.classList.remove('callout-teal', 'callout-orange', 'callout-red');
+  res.style.borderLeftColor = correct ? 'var(--green-500)' : 'var(--red-500)';
+  res.style.background = correct ? '#f0fdf4' : '#fef2f2';
+  res.innerHTML = (correct ? '✅ Doğru! ' : '❌ Yanlış. ') + s.explain;
+  res.style.color = correct ? 'var(--green-500)' : 'var(--red-500)';
+
+  if (correct) addXP(20);
+
+  document.getElementById('mlScore').textContent = mlScore;
+  document.getElementById('mlTotal').textContent = mlTotal;
+}
+
+function nextMLScenario() {
+  mlIdx = (mlIdx + 1) % mlScenarios.length;
+  renderMLScenario();
+}
+
+setTimeout(() => {
+  const mlCont = document.getElementById('mlGameContainer');
+  if (mlCont) renderMLScenario();
+}, 100);
+
+</script>
+</body>
+</html>
